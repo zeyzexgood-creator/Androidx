@@ -57,6 +57,7 @@ import com.itsaky.androidide.flashbar.SwipeDismissTouchListener.DismissCallbacks
 import com.itsaky.androidide.flashbar.anim.FlashAnimIconBuilder
 import com.itsaky.androidide.flashbar.databinding.FlashBarViewBinding
 import com.itsaky.androidide.flashbar.util.getStatusBarHeightInPx
+import dev.mutwakil.androidide.flashbar.R
 
 /**
  * The actual Flashbar withView representation that can consist of the title, message, button, icon,

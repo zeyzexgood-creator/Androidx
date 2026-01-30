@@ -38,6 +38,7 @@ import com.itsaky.androidide.flashbar.Flashbar.ProgressPosition.RIGHT
 import com.itsaky.androidide.flashbar.anim.FlashAnim
 import com.itsaky.androidide.flashbar.anim.FlashAnimBarBuilder
 import com.itsaky.androidide.flashbar.anim.FlashAnimIconBuilder
+import dev.mutwakil.androidide.flashbar.R
 
 private const val DEFAULT_SHADOW_STRENGTH = 4
 private const val DEFAUT_ICON_SCALE = 1.0f
