@@ -24,7 +24,7 @@
 
 package io.github.rosemoe.sora.editor.ts.predicate
 
-import com.itsaky.androidide.treesitter.TSQueryPredicateStep
+import dev.mutwakil.androidide.treesitter.TSQueryPredicateStep
 
 data class TsClientPredicateStep(
   val predicateType: TSQueryPredicateStep.Type,

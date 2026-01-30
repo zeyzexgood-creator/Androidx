@@ -16,7 +16,7 @@
  */
 
 
-import com.itsaky.androidide.build.config.BuildConfig
+import dev.mutwakil.androidide.build.config.BuildConfig
 
 plugins {
   alias(libs.plugins.android.library)

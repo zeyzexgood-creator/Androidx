@@ -26,7 +26,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.viewpager.widget.ViewPager;
-import com.itsaky.androidide.app.BaseIDEActivity;
+import dev.mutwakil.androidide.app.BaseIDEActivity;
 import com.termux.R;
 import com.termux.app.activities.HelpActivity;
 import com.termux.app.api.file.FileReceiverActivity;

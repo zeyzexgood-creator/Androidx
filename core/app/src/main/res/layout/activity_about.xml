@@ -84,7 +84,7 @@
 
       </com.google.android.material.card.MaterialCardView>
 
-      <com.itsaky.androidide.ui.BottomInsetHeightDistributor
+      <dev.mutwakil.androidide.ui.BottomInsetHeightDistributor
         android:id="@+id/height_distributor"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

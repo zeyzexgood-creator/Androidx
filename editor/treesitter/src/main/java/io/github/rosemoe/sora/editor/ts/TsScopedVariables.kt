@@ -24,14 +24,14 @@
 
 package io.github.rosemoe.sora.editor.ts
 
-import com.itsaky.androidide.treesitter.TSNode
-import com.itsaky.androidide.treesitter.TSQueryCapture
-import com.itsaky.androidide.treesitter.TSQueryCursor
-import com.itsaky.androidide.treesitter.TSTree
-import com.itsaky.androidide.treesitter.api.TreeSitterNode
-import com.itsaky.androidide.treesitter.api.TreeSitterQueryCapture
-import com.itsaky.androidide.treesitter.api.safeExecQueryCursor
-import com.itsaky.androidide.treesitter.string.UTF16String
+import dev.mutwakil.androidide.treesitter.TSNode
+import dev.mutwakil.androidide.treesitter.TSQueryCapture
+import dev.mutwakil.androidide.treesitter.TSQueryCursor
+import dev.mutwakil.androidide.treesitter.TSTree
+import dev.mutwakil.androidide.treesitter.api.TreeSitterNode
+import dev.mutwakil.androidide.treesitter.api.TreeSitterQueryCapture
+import dev.mutwakil.androidide.treesitter.api.safeExecQueryCursor
+import dev.mutwakil.androidide.treesitter.string.UTF16String
 import java.util.Stack
 
 private typealias TSNodeIndices = Pair<Int, Int>

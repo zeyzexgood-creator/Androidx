@@ -1,7 +1,7 @@
 package com.termux.app;
 
 import android.content.Context;
-import com.itsaky.androidide.app.BaseApplication;
+import dev.mutwakil.androidide.app.BaseApplication;
 import com.termux.shared.errors.Error;
 import com.termux.shared.logger.Logger;
 import com.termux.shared.termux.TermuxConstants;

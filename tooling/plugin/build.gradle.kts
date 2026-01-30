@@ -16,9 +16,9 @@
  */
 
 
-import com.itsaky.androidide.build.config.AGP_VERSION_MINIMUM
-import com.itsaky.androidide.build.config.BuildConfig
-import com.itsaky.androidide.build.config.ProjectConfig
+import dev.mutwakil.androidide.build.config.AGP_VERSION_MINIMUM
+import dev.mutwakil.androidide.build.config.BuildConfig
+import dev.mutwakil.androidide.build.config.ProjectConfig
 
 plugins {
   id("java-gradle-plugin")

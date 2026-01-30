@@ -20,8 +20,8 @@ package com.android.aaptcompiler
 import com.android.aaptcompiler.ResourceFile.Type.ProtoXml
 import com.android.aaptcompiler.ResourceFile.Type.Unknown
 import com.android.aaptcompiler.proto.serializeTableToPb
-import com.itsaky.androidide.layoutlib.resources.ResourceType
-import com.itsaky.androidide.layoutlib.resources.ResourceVisibility
+import dev.mutwakil.androidide.layoutlib.resources.ResourceType
+import dev.mutwakil.androidide.layoutlib.resources.ResourceVisibility
 import com.android.utils.FileUtils
 import java.io.File
 
