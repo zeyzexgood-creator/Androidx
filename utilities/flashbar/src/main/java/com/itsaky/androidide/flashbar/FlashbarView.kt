@@ -55,7 +55,7 @@ import com.itsaky.androidide.flashbar.Flashbar.ProgressPosition.LEFT
 import com.itsaky.androidide.flashbar.Flashbar.ProgressPosition.RIGHT
 import com.itsaky.androidide.flashbar.SwipeDismissTouchListener.DismissCallbacks
 import com.itsaky.androidide.flashbar.anim.FlashAnimIconBuilder
-import com.itsaky.androidide.flashbar.databinding.FlashBarViewBinding
+import dev.mutwakil.androidide.flashbar.databinding.FlashBarViewBinding
 import com.itsaky.androidide.flashbar.util.getStatusBarHeightInPx
 import dev.mutwakil.androidide.flashbar.R
 
