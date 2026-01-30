@@ -199,7 +199,7 @@ class ModuleWorkspaceTest {
 
     val testCls =
       FileProvider.testProjectRoot()
-        .resolve("app/src/main/java/com/itsaky/test/app/Test.java")
+        .resolve("app/src/main/java/dev/mutwakil/test/app/Test.java")
         .toAbsolutePath()
         .normalize()
     val testCls_renamed = testCls.parent!!.resolve("TestRenamed.java")
@@ -222,7 +222,7 @@ class ModuleWorkspaceTest {
     assertThat(root!!.path).isEqualTo(":")
 
     val source =
-      root.projectDir.toPath().resolve("app/src/main/java/com/itsaky/test/app/MainActivity.java")
+      root.projectDir.toPath().resolve("app/src/main/java/dev/mutwakil/test/app/MainActivity.java")
     val module = workspace.findModuleForFile(source)
     assertThat(module).isNotNull()
     assertThat(module!!.path).isEqualTo(":app")

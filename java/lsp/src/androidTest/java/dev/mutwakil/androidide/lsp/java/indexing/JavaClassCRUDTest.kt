@@ -53,13 +53,13 @@ class JavaClassCRUDTest {
       executeTransaction {
         // READ
         dbKlass = where(JavaClass::class.java)
-          .equalTo("fqn", "com/itsaky/androidide/indexing/TestClass")
+          .equalTo("fqn", "dev/mutwakil/androidide/indexing/TestClass")
           .findFirst()
 
         assertThat(dbKlass).isNotNull()
-        assertThat(dbKlass?.fqn).isEqualTo("com/itsaky/androidide/indexing/TestClass")
+        assertThat(dbKlass?.fqn).isEqualTo("dev/mutwakil/androidide/indexing/TestClass")
         assertThat(dbKlass?.name).isEqualTo("TestClass")
-        assertThat(dbKlass?.packageName).isEqualTo("com/itsaky/androidide/indexing")
+        assertThat(dbKlass?.packageName).isEqualTo("dev/mutwakil/androidide/indexing")
         assertThat(dbKlass?.accessFlags).isEqualTo(AccessFlags.ACC_PUBLIC or AccessFlags.ACC_FINAL)
         assertThat(dbKlass?.superClassFqn).isEqualTo("java/lang/Object")
         assertThat(dbKlass?.superInterfacesFqn).isEqualTo(RealmList<String>())
@@ -96,7 +96,7 @@ class JavaClassCRUDTest {
       executeTransaction {
         assertThat(
           where(JavaClass::class.java)
-            .equalTo("fqn", "com/itsaky/androidide/indexing/TestClass")
+            .equalTo("fqn", "dev/mutwakil/androidide/indexing/TestClass")
             .findFirst()?.accessFlags
         ).isEqualTo(AccessFlags.ACC_PUBLIC or AccessFlags.ACC_ABSTRACT)
       }
@@ -110,7 +110,7 @@ class JavaClassCRUDTest {
       executeTransaction {
         assertThat(
           where(JavaClass::class.java)
-            .equalTo("fqn", "com/itsaky/androidide/indexing/TestClass")
+            .equalTo("fqn", "dev/mutwakil/androidide/indexing/TestClass")
             .findFirst()
         ).isNull()
       }

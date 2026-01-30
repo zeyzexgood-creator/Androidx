@@ -29,7 +29,7 @@ class InsnParserTest {
     val insnStr = """
     invoke-virtual Ljava/lang/String;->length()I
       =>
-    invoke-static Lcom/itsaky/androidide/desugaring/sample/java/lang/DesugaredString;->length(Ljava/lang/String;)I
+    invoke-static Ldev/mutwakil/androidide/desugaring/sample/java/lang/DesugaredString;->length(Ljava/lang/String;)I
       ;;
   """.trimIndent()
 
@@ -42,7 +42,7 @@ class InsnParserTest {
     val insnStr2 = """
     invoke-virtual Ljava/lang/String;->charAt(I)C
       =>
-    invoke-static Lcom/itsaky/androidide/desugaring/sample/java/lang/DesugaredString;->charAt(Ljava/lang/String;I)C
+    invoke-static Ldev/mutwakil/androidide/desugaring/sample/java/lang/DesugaredString;->charAt(Ljava/lang/String;I)C
       ;;
   """.trimIndent()
 
@@ -58,7 +58,7 @@ class InsnParserTest {
     val insnStr = """
     invoke-virtual Ljava/lang/Object;->clone()Ljava/lang/Object;
       =>
-    invoke-static Lcom/itsaky/androidide/desugaring/sample/java/lang/DesugaredObject;->clone(Ljava/lang/Object;)Ljava/lang/Object;
+    invoke-static Ldev/mutwakil/androidide/desugaring/sample/java/lang/DesugaredObject;->clone(Ljava/lang/Object;)Ljava/lang/Object;
       ;;
   """.trimIndent()
 
@@ -71,7 +71,7 @@ class InsnParserTest {
     val insnStr2 = """
     invoke-virtual Ljava/lang/String;->concat(Ljava/lang/String;)Ljava/lang/String;
       =>
-    invoke-static Lcom/itsaky/androidide/desugaring/sample/java/lang/DesugaredString;->concat(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+    invoke-static Ldev/mutwakil/androidide/desugaring/sample/java/lang/DesugaredString;->concat(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
       ;;
   """.trimIndent()
 
@@ -87,7 +87,7 @@ class InsnParserTest {
     val insnStr = """
     invoke-virtual Ljava/lang/String;->someArr()[I
       =>
-    invoke-static Lcom/itsaky/androidide/desugaring/sample/java/lang/DesugaredArrays;->someArr([I)I
+    invoke-static Ldev/mutwakil/androidide/desugaring/sample/java/lang/DesugaredArrays;->someArr([I)I
       ;;
   """.trimIndent()
 
@@ -100,7 +100,7 @@ class InsnParserTest {
     val insnStr2 = """
     invoke-static Ljava/util/Arrays;->sort([I)V
       =>
-    invoke-static Lcom/itsaky/androidide/desugaring/sample/java/util/DesugaredArrays;->sort([I)V
+    invoke-static Ldev/mutwakil/androidide/desugaring/sample/java/util/DesugaredArrays;->sort([I)V
       ;;
   """.trimIndent()
 
@@ -116,7 +116,7 @@ class InsnParserTest {
     val insnStr = """
     invoke-virtual Ljava/lang/String;->length()I
       =>
-    invoke-static Lcom/itsaky/androidide/desugaring/sample/java/lang/DesugaredArrays;->length([[I)I
+    invoke-static Ldev/mutwakil/androidide/desugaring/sample/java/lang/DesugaredArrays;->length([[I)I
       ;;
   """.trimIndent()
 
@@ -129,7 +129,7 @@ class InsnParserTest {
     val insnStr2 = """
     invoke-static Ljava/util/Arrays;->deepEquals([[I)V
       =>
-    invoke-static Lcom/itsaky/androidide/desugaring/sample/java/util/DesugaredArrays;->deepEquals([[I)V
+    invoke-static Ldev/mutwakil/androidide/desugaring/sample/java/util/DesugaredArrays;->deepEquals([[I)V
       ;;
   """.trimIndent()
 
@@ -145,7 +145,7 @@ class InsnParserTest {
     val insnStr = """
     invoke-virtual Ljava/lang/String;->clone()Ljava/lang/Object;
       =>
-    invoke-static Lcom/itsaky/androidide/desugaring/sample/java/lang/DesugaredObject;->clone([Ljava/lang/String;)Ljava/lang/Object;
+    invoke-static Ldev/mutwakil/androidide/desugaring/sample/java/lang/DesugaredObject;->clone([Ljava/lang/String;)Ljava/lang/Object;
       ;;
   """.trimIndent()
 
@@ -158,7 +158,7 @@ class InsnParserTest {
     val insnStr2 = """
     invoke-static Ljava/util/Arrays;->asList([Ljava/lang/String;)Ljava/util/List;
       =>
-    invoke-static Lcom/itsaky/androidide/desugaring/sample/java/util/DesugaredArrays;->asList([Ljava/lang/String;)Ljava/util/List;
+    invoke-static Ldev/mutwakil/androidide/desugaring/sample/java/util/DesugaredArrays;->asList([Ljava/lang/String;)Ljava/util/List;
       ;;
   """.trimIndent()
 
@@ -174,7 +174,7 @@ class InsnParserTest {
     val insnStr = """
     invoke-static Ljava/lang/Math;->max([I)I
       =>
-    invoke-static Lcom/itsaky/androidide/desugaring/sample/java/lang/DesugaredMath;->max([I)I
+    invoke-static Ldev/mutwakil/androidide/desugaring/sample/java/lang/DesugaredMath;->max([I)I
       ;;
   """.trimIndent()
 
@@ -187,7 +187,7 @@ class InsnParserTest {
     val insnStr2 = """
     invoke-virtual Ljava/lang/String;->toCharArray()[C
       =>
-    invoke-static Lcom/itsaky/androidide/desugaring/sample/java/lang/DesugaredString;->toCharArray(Ljava/lang/String;)[C
+    invoke-static Ldev/mutwakil/androidide/desugaring/sample/java/lang/DesugaredString;->toCharArray(Ljava/lang/String;)[C
       ;;
   """.trimIndent()
 
@@ -268,7 +268,7 @@ class InsnParserTest {
     val insnStr = """
       invoke-virtual Ljava/io/InputStream;->readNBytes(I)[B
         =>
-      invoke-static Lcom/itsaky/androidide/desugaring/sample/java/io/DesugaredInputStream;->readNBytes(Ljava/io/InputStream;I)V
+      invoke-static Ldev/mutwakil/androidide/desugaring/sample/java/io/DesugaredInputStream;->readNBytes(Ljava/io/InputStream;I)V
         ;;
     """.trimIndent()
 
@@ -297,11 +297,11 @@ class InsnParserTest {
     val insnStr = """
     invoke-virtual Ljava/io/InputStream;->readNBytes(I)[B
       =>
-    invoke-static Lcom/itsaky/androidide/desugaring/sample/java/io/DesugaredInputStream;->readNBytes([Ljava/io/InputStream;I)V
+    invoke-static Ldev/mutwakil/androidide/desugaring/sample/java/io/DesugaredInputStream;->readNBytes([Ljava/io/InputStream;I)V
       ;;
     invoke-static Ljava/lang/Math;->random()D
       =>
-    invoke-static Lcom/itsaky/androidide/desugaring/sample/java/util/DesugaredMath;->random()D
+    invoke-static Ldev/mutwakil/androidide/desugaring/sample/java/util/DesugaredMath;->random()D
       ;;
   """.trimIndent()
 

@@ -30,9 +30,9 @@ import openjdk.tools.classfile.AccessFlags
 object ModelBuilderTestUtil {
 
   fun createTestClass() = JavaClass.newInstance(
-    fqn = "com/itsaky/androidide/indexing/TestClass",
+    fqn = "dev/mutwakil/androidide/indexing/TestClass",
     name = "TestClass",
-    packageName = "com/itsaky/androidide/indexing",
+    packageName = "dev/mutwakil/androidide/indexing",
     accessFlags = AccessFlags.ACC_PUBLIC or AccessFlags.ACC_FINAL,
     superClassFqn = "java/lang/Object",
     superInterfacesFqn = RealmList(),

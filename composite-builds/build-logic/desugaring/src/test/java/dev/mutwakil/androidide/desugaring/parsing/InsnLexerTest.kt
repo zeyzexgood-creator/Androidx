@@ -110,7 +110,7 @@ class InsnLexerTest {
     val instruction = """
       invoke-virtual Ljava/io/InputStream;->readNBytes(I)[B
        =>
-      invoke-static Lcom/itsaky/androidide/desugaring/sample/java/io/DesugaredInputStream;->readNBytes([Ljava/io/InputStream;I)V
+      invoke-static Ldev/mutwakil/androidide/desugaring/sample/java/io/DesugaredInputStream;->readNBytes([Ljava/io/InputStream;I)V
       ;;
     """.trimIndent()
 
@@ -125,7 +125,7 @@ class InsnLexerTest {
   @Test
   fun `test tokenization for simple instruction with comments`() {
     val instruction =
-      "# comment\ninvoke-static Lcom/itsaky/androidide/desugaring/sample/java/io/DesugaredInputStream;->readNBytes([Ljava/io/InputStream;I)V"
+      "# comment\ninvoke-static Ldev/mutwakil/androidide/desugaring/sample/java/io/DesugaredInputStream;->readNBytes([Ljava/io/InputStream;I)V"
 
     val lexer = InsnLexer(instruction)
     val tokens = lexer.all()
@@ -138,7 +138,7 @@ class InsnLexerTest {
   @Test
   fun `test tokenization for simple instruction with comments and CRLF line terminator`() {
     val instruction =
-      "# comment\r\ninvoke-static Lcom/itsaky/androidide/desugaring/sample/java/io/DesugaredInputStream;->readNBytes([Ljava/io/InputStream;I)V"
+      "# comment\r\ninvoke-static Ldev/mutwakil/androidide/desugaring/sample/java/io/DesugaredInputStream;->readNBytes([Ljava/io/InputStream;I)V"
 
     val lexer = InsnLexer(instruction)
     val tokens = lexer.all()
