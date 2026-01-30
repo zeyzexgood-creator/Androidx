@@ -28,6 +28,11 @@ pluginManagement {
     gradlePluginPortal()
     google()
     mavenCentral()
+    maven { url = uri("https://repo.eclipse.org/content/repositories/ee4j-snapshots/") }
+    mavenLocal()
+    maven { url = uri("https://jitpack.io") }
+    maven { url = uri("https://repo.gradle.org/gradle/libs-releases") }
+    maven { url = uri("https://www.jetbrains.com/intellij-repository/releases") }
   }
 }
 
@@ -72,6 +77,10 @@ dependencyResolutionManagement {
     maven { url = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/") }
     maven { url = uri("https://s01.oss.sonatype.org/content/groups/public/") }
     maven { url = uri("https://jitpack.io") }
+    maven { url = uri("https://repo.eclipse.org/content/repositories/ee4j-snapshots/") }
+    mavenLocal()
+    maven { url = uri("https://repo.gradle.org/gradle/libs-releases") }
+    maven { url = uri("https://www.jetbrains.com/intellij-repository/releases") }
   }
 }
 
