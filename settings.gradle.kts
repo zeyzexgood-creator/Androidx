@@ -126,7 +126,7 @@ if (FDroidConfig.hasRead && FDroidConfig.isFDroidBuild) {
 }
 
 gradle.rootProject {
-  val baseVersion = "2.7.1"
+  val baseVersion = "v-2.7.1"
 
   var commitHash = "gradle-tooling-api-9.2.1"
 
