@@ -1,4 +1,4 @@
-import com.itsaky.androidide.build.config.BuildConfig
+import dev.mutwakil.androidide.build.config.BuildConfig
 
 /*
  *  This file is part of AndroidIDE.

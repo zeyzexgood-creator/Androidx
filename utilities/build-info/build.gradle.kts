@@ -17,16 +17,16 @@
 
 
 import com.android.SdkConstants
-import com.itsaky.androidide.build.config.AGP_VERSION_MINIMUM
-import com.itsaky.androidide.build.config.BuildConfig
-import com.itsaky.androidide.build.config.CI
-import com.itsaky.androidide.build.config.FDroidConfig
-import com.itsaky.androidide.build.config.ProjectConfig
-import com.itsaky.androidide.build.config.VersionUtils
-import com.itsaky.androidide.build.config.downloadVersion
-import com.itsaky.androidide.build.config.publishingVersion
-import com.itsaky.androidide.build.config.replaceContents
-import com.itsaky.androidide.build.config.simpleVersionName
+import dev.mutwakil.androidide.build.config.AGP_VERSION_MINIMUM
+import dev.mutwakil.androidide.build.config.BuildConfig
+import dev.mutwakil.androidide.build.config.CI
+import dev.mutwakil.androidide.build.config.FDroidConfig
+import dev.mutwakil.androidide.build.config.ProjectConfig
+import dev.mutwakil.androidide.build.config.VersionUtils
+import dev.mutwakil.androidide.build.config.downloadVersion
+import dev.mutwakil.androidide.build.config.publishingVersion
+import dev.mutwakil.androidide.build.config.replaceContents
+import dev.mutwakil.androidide.build.config.simpleVersionName
 
 plugins {
   //noinspection JavaPluginLanguageLevel
@@ -47,7 +47,7 @@ val buildInfoGenDir: Provider<Directory> = project.layout.buildDirectory.dir("ge
 sourceSets { getByName("main").java.srcDir(buildInfoGenDir) }
 
 tasks.create("generateBuildInfo") {
-  val buildInfoPath = "com/itsaky/androidide/buildinfo/BuildInfo.java"
+  val buildInfoPath = "dev/mutwakil/androidide/buildinfo/BuildInfo.java"
   val buildInfo = buildInfoGenDir.get().file(buildInfoPath)
   val buildInfoIn = project.file("src/main/java/${buildInfoPath}.in")
 

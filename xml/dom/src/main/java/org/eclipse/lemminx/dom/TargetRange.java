@@ -10,7 +10,7 @@
  */
 package org.eclipse.lemminx.dom;
 
-import com.itsaky.androidide.models.Range;
+import dev.mutwakil.androidide.models.Range;
 
 /** Target range API. */
 public interface TargetRange {

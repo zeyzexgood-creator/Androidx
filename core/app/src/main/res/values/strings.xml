@@ -17,5 +17,5 @@
 
 <resources>
   <!--  Required by F-Droid-->
-  <string name="app_name" translatable="false">AndroidIDE-Pro</string>
+  <string name="app_name" translatable="false">AndroidIDE-Dev</string>
 </resources>

@@ -12,8 +12,8 @@
  */
 package org.eclipse.lemminx.utils;
 
-import com.itsaky.androidide.models.Position;
-import com.itsaky.androidide.models.Range;
+import dev.mutwakil.androidide.models.Position;
+import dev.mutwakil.androidide.models.Range;
 
 import java.util.List;
 import java.util.function.Predicate;
