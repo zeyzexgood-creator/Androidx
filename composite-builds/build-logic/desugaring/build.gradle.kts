@@ -1,3 +1,6 @@
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 /*
  *  This file is part of AndroidIDE.
  *
@@ -37,5 +40,12 @@ gradlePlugin {
       displayName = "AndroidIDE Method Desugaring Plugin"
       description = "Gradle plugin for method desugaring in Android projects."
     }
+  }
+}
+tasks.withType<KotlinCompile> {
+  compilerOptions {
+    apiVersion.set(KotlinVersion.KOTLIN_2_1)
+    languageVersion.set(KotlinVersion.KOTLIN_2_1)
+    jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
   }
 }

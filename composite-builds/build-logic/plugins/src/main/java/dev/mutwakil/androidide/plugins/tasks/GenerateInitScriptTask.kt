@@ -17,7 +17,6 @@
 
 package dev.mutwakil.androidide.plugins.tasks
 
-import dev.mutwakil.androidide.build.config.VersionUtils
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Property
@@ -25,8 +24,16 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 
+
 /**
+ * Keywords: [init.gradle, gradle, gradle plugin, initscript, 2.7.1, 8.5.1]
+ * This code generates init.gradle script that is reponsible for all project gradle repos and
+ * gradle plugin classpath.
  * Generates the Gradle init script for AndroidIDE.
+ * This script is also stored at
+ * ~/AndroidIDE/app/build/intermediates/assets/debug/mergeDebugAssets/data/common
+ *
+ * I have replaced itsaky gradle plugin with a local jar.
  */
 abstract class GenerateInitScriptTask : DefaultTask() {
 
@@ -54,29 +61,23 @@ abstract class GenerateInitScriptTask : DefaultTask() {
       initscript {
           repositories {
               
-              // Always specify the snapshots repository first
-              maven {
-                  // Add snapshots repository for AndroidIDE CI builds
-                  url "${VersionUtils.SONATYPE_SNAPSHOTS_REPO}"
+              flatDir {
+                    // TODO: issue with dirs requiring two params to work
+                    //       when the first one is the only one required,
+                    //       second value is just a dummy value
+                    dirs "/data/data/dev.mutwakil.androidide/files/home/.androidide/plugin", "plugin"
               }
               
-              maven {
-                  // Add public repository for AndroidIDE release builds
-                  url "${VersionUtils.SONATYPE_PUBLIC_REPO}"
-              }
-              
-              mavenCentral()
-              google()
+              // mavenCentral()
+              // google()
           }
 
           dependencies {
-              classpath('${mavenGroupId.get()}:gradle-plugin:${downloadVersion.get()}') {
-                  setChanging(false)
-              }
+              classpath  name: "androidide-gradle-plugin"
           }
       }
       
-      apply plugin: com.itsaky.androidide.gradle.AndroidIDEInitScriptPlugin
+      apply plugin: dev.mutwakil.androidide.gradle.AndroidIDEInitScriptPlugin
     """
           .trimIndent()
       )

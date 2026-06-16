@@ -21,7 +21,9 @@ import dev.mutwakil.androidide.plugins.NoDesugarPlugin
 @Suppress("JavaPluginLanguageLevel")
 plugins {
     id("java-library")
+    id("org.jetbrains.kotlin.jvm")
     id("com.vanniktech.maven.publish.base")
+    id("kotlin-kapt")
 }
 
 apply {
@@ -34,6 +36,7 @@ description = "AndroidIDE Logging Framework"
 
 dependencies {
     compileOnly(projects.utilities.frameworkStubs)
+    kapt(libs.google.auto.service)
 
     api(libs.logging.logback.core)
     api(libs.logging.logback.classic) {
@@ -46,4 +49,7 @@ dependencies {
 
     testImplementation(libs.tests.junit)
     testImplementation(libs.tests.google.truth)
+    implementation(kotlin("stdlib-jdk8"))
+    implementation(libs.google.auto.service.annotations)
+
 }

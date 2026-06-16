@@ -67,6 +67,7 @@ import dev.mutwakil.androidide.utils.withIcon
 import dev.mutwakil.androidide.viewmodel.BuildVariantsViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import openjdk.tools.sjavac.BuildState
 import java.io.File
 import java.util.concurrent.CompletableFuture
 import java.util.regex.Pattern
@@ -725,5 +726,12 @@ abstract class ProjectHandlerActivity : BaseEditorActivity() {
       }
 
     return mSearchingProgress
+  }
+  private fun installApk(state : dev.mutwakil.androidide.viewmodel.BuildState.AwaitingInstall){
+    apkInstallationViewModel.installApk(
+        context = this,
+        apk = state.apkFile,
+        launchInDebugMode = state.launchInDebugMode,
+    )
   }
 }

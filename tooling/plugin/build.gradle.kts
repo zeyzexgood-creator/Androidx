@@ -69,7 +69,7 @@ gradlePlugin {
 
   plugins {
     create("initScriptPlugin") {
-      id = "${BuildConfig.packageName}.init"
+      id = "io.github.wadamzmail.init"
       implementationClass = "${BuildConfig.packageName}.gradle.AndroidIDEInitScriptPlugin"
       displayName = "AndroidIDE Init Script Gradle Plugin"
       description = "Init script Gradle plugin for projects that are built with AndroidIDE"
@@ -77,7 +77,7 @@ gradlePlugin {
     }
 
     create("gradlePlugin") {
-      id = BuildConfig.packageName
+      id = "io.github.wadamzmail.gradle"
       implementationClass = "${BuildConfig.packageName}.gradle.AndroidIDEGradlePlugin"
       displayName = "AndroidIDE Gradle Plugin"
       description = "Gradle plugin for projects that are built with AndroidIDE"
@@ -85,11 +85,17 @@ gradlePlugin {
     }
 
     create("logsenderPlugin") {
-      id = "${BuildConfig.packageName}.logsender"
+      id = "io.github.wadamzmail.logsender"
       implementationClass = "${BuildConfig.packageName}.gradle.LogSenderPlugin"
       displayName = "AndroidIDE LogSender Gradle Plugin"
       description = "Gradle plugin for applying LogSender-specific configuration to projects that are built with AndroidIDE"
       tags.set(setOf("androidide", "logsender"))
     }
   }
+}
+
+tasks.named<Jar>("jar") {
+  archiveBaseName.set("androidide-gradle-plugin")
+  archiveClassifier.set("") // Removes the default "all" classifier
+  archiveVersion.set("")
 }

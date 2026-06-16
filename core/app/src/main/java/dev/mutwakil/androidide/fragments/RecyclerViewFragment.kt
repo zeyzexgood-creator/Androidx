@@ -79,6 +79,6 @@ abstract class RecyclerViewFragment<A : RecyclerView.Adapter<*>> :
   }
 
   private fun checkIsEmpty() {
-    emptyStateViewModel.isEmpty.value = _binding?.root?.adapter?.itemCount == 0
+    emptyStateViewModel.setEmpty(binding?.root?.adapter?.itemCount == 0)
   }
 }

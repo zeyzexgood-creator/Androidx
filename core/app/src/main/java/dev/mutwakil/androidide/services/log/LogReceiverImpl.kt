@@ -28,12 +28,14 @@ import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
 /**
- * Handles IPC connections from other proceses.
+ * Handles IPC connections from other processes.
  *
  * @author Akash Yadav
  */
-class LogReceiverImpl(consumer: ((LogLine) -> Unit)? = null) : ILogReceiver.Stub(), AutoCloseable {
-
+class LogReceiverImpl(
+  consumer: ((LogLine) -> Unit)? = null,
+) : ILogReceiver.Stub(),
+  AutoCloseable {
   private val senderHandler = MultiLogSenderHandler()
   private val senders = LogSendersRegistry()
   private val consumerLock = ReentrantLock(true)
@@ -48,13 +50,10 @@ class LogReceiverImpl(consumer: ((LogLine) -> Unit)? = null) : ILogReceiver.Stub
     }
 
   companion object {
-
     private val log = LoggerFactory.getLogger(LogReceiverImpl::class.java)
   }
 
-  private fun synchronizeConsumer(consumer: (LogLine) -> Unit): (LogLine) -> Unit {
-    return { line -> consumerLock.withLock { consumer(line) } }
-  }
+  private fun synchronizeConsumer(consumer: (LogLine) -> Unit): (LogLine) -> Unit = { line -> consumerLock.withLock { consumer(line) } }
 
   fun acceptSenders() {
     if (senderHandler.isAlive()) {
@@ -67,7 +66,7 @@ class LogReceiverImpl(consumer: ((LogLine) -> Unit)? = null) : ILogReceiver.Stub
 
   override fun ping() {
     doAsync("ping") {
-      Log.d("LogRecevier", "ping: Received a ping request")
+      Log.d("LogReceiver", "ping: Received a ping request")
     }
   }
 
@@ -90,7 +89,8 @@ class LogReceiverImpl(consumer: ((LogLine) -> Unit)? = null) : ILogReceiver.Stub
       if (existingSender?.isAlive() == true) {
         log.warn(
           "Client '${existingSender.packageName}' has been restarted with process ID '${caching.pid}'" +
-              " Previous connection with process ID '${existingSender.pid}' will be closed...")
+                  " Previous connection with process ID '${existingSender.pid}' will be closed...",
+        )
         existingSender.onDisconnect()
       }
 
@@ -98,7 +98,10 @@ class LogReceiverImpl(consumer: ((LogLine) -> Unit)? = null) : ILogReceiver.Stub
     }
   }
 
-  private fun connectSender(caching: CachingLogSender, port: Int) {
+  private fun connectSender(
+    caching: CachingLogSender,
+    port: Int,
+  ) {
     // logging this also makes sure that the package name, pid and sender ID are
     // cached when the sender binds to the service
     // these fields are then used on disconnectAll()
@@ -127,7 +130,10 @@ class LogReceiverImpl(consumer: ((LogLine) -> Unit)? = null) : ILogReceiver.Stub
     }
   }
 
-  override fun disconnect(packageName: String, senderId: String) {
+  override fun disconnect(
+    packageName: String,
+    senderId: String,
+  ) {
     doAsync("disconnect") {
       val port = senderHandler.getPort()
       if (port == -1) {
@@ -136,7 +142,8 @@ class LogReceiverImpl(consumer: ((LogLine) -> Unit)? = null) : ILogReceiver.Stub
 
       if (!senders.containsKey(packageName)) {
         log.warn(
-          "Received disconnect request from a log sender which is not connected: '${packageName}'")
+          "Received disconnect request from a log sender which is not connected: '$packageName'",
+        )
         return@doAsync
       }
 
@@ -156,7 +163,10 @@ class LogReceiverImpl(consumer: ((LogLine) -> Unit)? = null) : ILogReceiver.Stub
     }
   }
 
-  private fun disconnectSender(packageName: String, senderId: String) {
+  private fun disconnectSender(
+    packageName: String,
+    senderId: String,
+  ) {
     log.info("Disconnecting from client: '{}'", packageName)
     this.senderHandler.removeClient(senderId)
     this.senders.remove(packageName)
@@ -173,7 +183,10 @@ class LogReceiverImpl(consumer: ((LogLine) -> Unit)? = null) : ILogReceiver.Stub
     senders.clear()
   }
 
-  private fun doAsync(actionName: String, action: () -> Unit) {
+  private fun doAsync(
+    actionName: String,
+    action: () -> Unit,
+  ) {
     executeAsyncProvideError(action::invoke) { _, error ->
       if (error != null) {
         log.error("Failed to perform action '{}'", actionName, error)

@@ -308,6 +308,9 @@
       <module name="AndroidIDE.annotation.processors-ksp" options="-proc:none" />
       <module name="AndroidIDE.annotation.processors-ksp.main" options="-proc:none" />
       <module name="AndroidIDE.annotation.processors-ksp.test" options="-proc:none" />
+      <module name="AndroidIDE.logging.logger" options="-proc:none" />
+      <module name="AndroidIDE.logging.logger.main" options="-proc:none" />
+      <module name="AndroidIDE.logging.logger.test" options="-proc:none" />
       <module name="AndroidIDE.testing.commonTest" options="-proc:none" />
       <module name="AndroidIDE.testing.commonTest.main" options="-proc:none" />
       <module name="AndroidIDE.testing.commonTest.test" options="-proc:none" />

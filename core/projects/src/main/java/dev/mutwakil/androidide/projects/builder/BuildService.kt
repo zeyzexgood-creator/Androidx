@@ -21,6 +21,7 @@ import dev.mutwakil.androidide.lookup.Lookup
 import dev.mutwakil.androidide.lookup.Lookup.Key
 import dev.mutwakil.androidide.tooling.api.IProject
 import dev.mutwakil.androidide.tooling.api.messages.InitializeProjectParams
+import dev.mutwakil.androidide.tooling.api.messages.TaskExecutionMessage
 import dev.mutwakil.androidide.tooling.api.messages.result.BuildCancellationRequestResult
 import dev.mutwakil.androidide.tooling.api.messages.result.InitializeResult
 import dev.mutwakil.androidide.tooling.api.messages.result.TaskExecutionResult
@@ -72,12 +73,12 @@ interface BuildService {
   /**
    * Execute the given tasks.
    *
-   * @param tasks The tasks to execute. If the fully qualified path of the task is not specified,
+   * @param message The tasks to execute. If the fully qualified path of the task is not specified,
    *   then it will be executed in the root project directory.
    * @return A [CompletableFuture] which returns a list of [TaskExecutionResult]. The result
    *   contains a list of tasks that were executed and the result of the whole execution.
    */
-  fun executeTasks(vararg tasks: String): CompletableFuture<TaskExecutionResult>
+  fun executeTasks(message: TaskExecutionMessage): CompletableFuture<TaskExecutionResult>
 
   /** Cancel any running build. */
   fun cancelCurrentBuild(): CompletableFuture<BuildCancellationRequestResult>

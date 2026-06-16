@@ -15,6 +15,7 @@
  *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -65,5 +66,14 @@ gradlePlugin {
       id = "dev.mutwakil.androidide.build.lexergenerator"
       implementationClass = "dev.mutwakil.androidide.plugins.LexerGeneratorPlugin"
     }
+  }
+}
+
+tasks.withType<KotlinCompile> {
+  compilerOptions {
+    apiVersion.set(KotlinVersion.KOTLIN_2_1)
+    languageVersion.set(KotlinVersion.KOTLIN_2_1)
+    jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+    compilerOptions.freeCompilerArgs.add("-Xuse-fir-lt=false")
   }
 }

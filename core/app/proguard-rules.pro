@@ -19,6 +19,8 @@
 # Builder model implementations
 -keep class dev.mutwakil.androidide.builder.model.** { *; }
 
+-keep class dev.mutwakil.androidide.logging.** { *; }
+
 # Eclipse
 -keep class org.eclipse.** { *; }
 

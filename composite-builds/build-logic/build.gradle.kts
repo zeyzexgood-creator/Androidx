@@ -1,3 +1,7 @@
+import org.gradle.kotlin.dsl.withType
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 /*
 *  This file is part of AndroidIDE.
 *
@@ -26,4 +30,12 @@ subprojects {
       targetCompatibility = JavaVersion.VERSION_17
     }
   }
+  tasks.withType<KotlinCompile> {
+    compilerOptions {
+      apiVersion.set(org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_1)
+      languageVersion.set(KotlinVersion.KOTLIN_2_1)
+      jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+    }
+  }
+
 }

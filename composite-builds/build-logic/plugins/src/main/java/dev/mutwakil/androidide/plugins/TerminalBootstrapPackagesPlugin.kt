@@ -36,14 +36,14 @@ class TerminalBootstrapPackagesPlugin : Plugin<Project> {
      * The bootstrap packages, mapped with the CPU ABI as the key and the ZIP file's sha256sum as the value.
      */
     private val BOOTSTRAP_PACKAGES = mapOf(
-      "aarch64" to "85d9a0a8dafb0ee2658f9828e11020932662d2b2af6ab368325efcfffbe8112e",
-      "arm" to "29be1179c2f1cdfae49278ea216e0cf46622eaf864cf681b151bcf3c2eff6cb9"
+      "aarch64" to "25b3dada134ed1182627b5812b4b78e5c8fe0a864e0029ba205b65c9ec989111",
+      "arm" to "f058af0b4a4ec27c741b24045345f4751bf64046b6621d5b8c48eba46689bc3b"
     )
 
     /**
      * The bootstrap packages version, basically the tag name of the GitHub release.
      */
-    private const val BOOTSTRAP_PACKAGES_VERSION = "2026.6.12"
+    private const val BOOTSTRAP_PACKAGES_VERSION = "2026.6.16"
 
     private const val PACKAGES_DOWNLOAD_URL =
       "https://github.com/wadamzmail/terminal-packages/releases/download/bootstrap-%1\$s/bootstrap-release-%2\$s.zip.9"

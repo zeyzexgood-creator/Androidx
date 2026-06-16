@@ -23,10 +23,12 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.AttributeSet
+import android.view.View
 import android.view.inputmethod.EditorInfo
 import androidx.annotation.StringRes
 import com.blankj.utilcode.util.FileUtils
 import com.blankj.utilcode.util.SizeUtils
+import com.itsaky.androidide.editor.utils.getOperatorRangeAt
 import dev.mutwakil.androidide.editor.R.string
 import dev.mutwakil.androidide.editor.adapters.CompletionListAdapter
 import dev.mutwakil.androidide.editor.api.IEditor
@@ -73,6 +75,7 @@ import dev.mutwakil.androidide.tasks.launchAsyncWithProgress
 import dev.mutwakil.androidide.utils.DocumentUtils
 import dev.mutwakil.androidide.utils.flashError
 import io.github.rosemoe.sora.event.ContentChangeEvent
+import io.github.rosemoe.sora.event.LongPressEvent
 import io.github.rosemoe.sora.event.SelectionChangeEvent
 import io.github.rosemoe.sora.lang.EmptyLanguage
 import io.github.rosemoe.sora.lang.Language
@@ -89,12 +92,14 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import org.slf4j.LoggerFactory
 import java.io.File
+import kotlin.coroutines.resume
 
 /**
  * [CodeEditor] implementation for the IDE.
@@ -111,6 +116,8 @@ open class IDEEditor @JvmOverloads constructor(
 
   @Suppress("PropertyName")
   internal var _file: File? = null
+
+  var isReadOnlyContext = false
 
   private var _actionsMenu: EditorActionsMenu? = null
   private var _signatureHelpWindow: SignatureHelpWindow? = null
@@ -143,6 +150,14 @@ open class IDEEditor @JvmOverloads constructor(
   private var setupTsLanguageJob: Job? = null
   private var sigHelpCancelChecker: ICancelChecker? = null
 
+  private var _includeDebugInfoOnCopy = false
+  var includeDebugInfoOnCopy: Boolean
+    get() = _includeDebugInfoOnCopy
+    set(value) {
+      _includeDebugInfoOnCopy = value
+    }
+
+
   var languageServer: ILanguageServer? = null
     private set
 
@@ -174,6 +189,9 @@ open class IDEEditor @JvmOverloads constructor(
     get() {
       return _diagnosticWindow ?: DiagnosticWindow(this).also { _diagnosticWindow = it }
     }
+
+  val isReadyToAppend: Boolean
+    get() = !isReleased && isAttachedToWindow && isLaidOut && width > 0
 
   companion object {
 
@@ -213,6 +231,60 @@ open class IDEEditor @JvmOverloads constructor(
     this._file = file
     file?.also {
       dispatchDocumentOpenEvent()
+    }
+  }
+
+  /**
+   * Suspends the current coroutine until the editor has valid dimensions (`width > 0`).
+   *
+   * This is a **reactive** alternative to busy-waiting or `postDelayed`. It ensures that
+   * no text insertion is attempted before the editor's internal layout engine is ready,
+   * preventing the `ArrayIndexOutOfBoundsException`.
+   *
+   * @param onForceVisible A callback invoked immediately if the view is not ready.
+   * Used to set the view to `VISIBLE` and trigger the layout pass.
+   */
+  suspend fun awaitLayout(onForceVisible: () -> Unit) {
+    if (isReadyToAppend) return
+
+    withContext(Dispatchers.Main) {
+      onForceVisible()
+    }
+
+    return suspendCancellableCoroutine { continuation ->
+      val listener = object : OnLayoutChangeListener {
+        override fun onLayoutChange(
+          v: View?, left: Int, top: Int, right: Int, bottom: Int,
+          oldLeft: Int, oldTop: Int, oldRight: Int, oldBottom: Int
+        ) {
+          if ((v?.width ?: 0) > 0) {
+            v?.removeOnLayoutChangeListener(this)
+            if (continuation.isActive) {
+              continuation.resume(Unit)
+            }
+          }
+        }
+      }
+
+      addOnLayoutChangeListener(listener)
+
+      continuation.invokeOnCancellation {
+        removeOnLayoutChangeListener(listener)
+      }
+    }
+  }
+
+
+  /**
+   * Appends a block of text to the editor safely.
+   *
+   * It performs a final check on [isReadyToAppend] and wraps the underlying append operation
+   * in [runCatching]. This prevents the app from crashing if the editor's internal layout
+   * calculation fails during the insertion.
+   */
+  fun appendBatch(text: String) {
+    if (isReadyToAppend) {
+      runCatching { append(text) }
     }
   }
 
@@ -914,5 +986,34 @@ open class IDEEditor @JvmOverloads constructor(
 
   override fun setSelectionAround(line: Int, column: Int) {
     editorFeatures.setSelectionAround(line, column)
+  }
+
+  fun setSelectionFromPoint(x: Float, y: Float) {
+    if (isReleased) return
+
+    try {
+      val packedPos = getPointPosition(x, y)
+
+      val line = (packedPos ushr 32).toInt()
+      val column = (packedPos and 0xffffffffL).toInt()
+      if (line < 0 || column < 0) return
+
+      setSelection(line, column)
+    } catch (e: Exception) {
+      log.error("Error setting selection from point", e)
+    }
+  }
+
+  fun selectWordOrOperatorAtCursor() {
+    if (isReleased) return
+    selectCurrentWord()
+    if (cursor.isSelected) return
+    val line = cursor.leftLine
+    val column = cursor.leftColumn
+    val columnCount = text.getColumnCount(line)
+    if (column < 0 || column >= columnCount) return
+    val range = text.getOperatorRangeAt(line, column) ?: return
+    val (startCol, endCol) = range
+    setSelectionRegion(line, startCol, line, endCol)
   }
 }

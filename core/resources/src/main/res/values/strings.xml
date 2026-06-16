@@ -35,6 +35,14 @@
   <string name="msg_finding_definition">Finding definition…</string>
   <string name="msg_no_definition">Definition not found</string>
 
+  <!-- Copy Diagnostics -->
+  <string name="msg_diagnostics_copied">Diagnostics copied to clipboard</string>
+  <string name="msg_no_diagnostics_to_copy">No diagnostics to copy</string>
+  <string name="msg_clipboard_copy_failed">Failed to copy to clipboard</string>
+
+
+  <string name="unknown_error">"An unknown error occurred."</string>
+
   <!-- Build Tools Installation -->
   <string name="msg_no_references">No references found</string>
   <string name="view_diags">Diagnostics</string>

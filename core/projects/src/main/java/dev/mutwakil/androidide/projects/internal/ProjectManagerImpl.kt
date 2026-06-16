@@ -39,6 +39,7 @@ import dev.mutwakil.androidide.projects.builder.BuildService
 import dev.mutwakil.androidide.tasks.executeAsync
 import dev.mutwakil.androidide.tooling.api.IAndroidProject
 import dev.mutwakil.androidide.tooling.api.IProject
+import dev.mutwakil.androidide.tooling.api.messages.TaskExecutionMessage
 import dev.mutwakil.androidide.tooling.api.messages.result.InitializeResult
 import dev.mutwakil.androidide.tooling.api.models.BuildVariantInfo
 import dev.mutwakil.androidide.utils.DocumentUtils
@@ -187,8 +188,8 @@ class ProjectManagerImpl : IProjectManager, EventReceiver {
       ).mapNotNull { it?.let { "${module.path}:${it}" } }
     }?.toList() ?: emptyList()
 
-
-    builder.executeTasks(*tasks.toTypedArray()).whenComplete { result, taskErr ->
+    val message = TaskExecutionMessage(tasks = listOf(*tasks.toTypedArray()))
+    builder.executeTasks(message).whenComplete { result, taskErr ->
       if (result == null || !result.isSuccessful || taskErr != null) {
         log.warn(
           "Execution for tasks failed: {} {}", tasks, taskErr ?: ""

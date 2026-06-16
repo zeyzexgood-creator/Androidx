@@ -19,45 +19,43 @@ package dev.mutwakil.androidide.fragments.output
 
 import android.os.Bundle
 import android.view.View
-import androidx.lifecycle.Lifecycle
-import ch.qos.logback.classic.Logger
-import ch.qos.logback.classic.LoggerContext
+import androidx.fragment.app.activityViewModels
+import ch.qos.logback.classic.Level
 import dev.mutwakil.androidide.R
-import dev.mutwakil.androidide.logging.LifecycleAwareAppender
-import org.slf4j.LoggerFactory
+import dev.mutwakil.androidide.logging.GlobalBufferAppender
+import dev.mutwakil.androidide.viewmodel.IDELogsViewModel
 
 /**
  * Fragment to show IDE logs.
  * @author Akash Yadav
  */
-class IDELogFragment : LogViewFragment() {
+class IDELogFragment :
+    LogViewFragment<IDELogsViewModel>(),
+    GlobalBufferAppender.Consumer {
+    override fun isSimpleFormattingEnabled() = true
 
-  private val lifecycleAwareAppender = LifecycleAwareAppender(Lifecycle.State.CREATED)
+    override fun getShareableFilename() = "ide_logs"
 
-  override fun isSimpleFormattingEnabled() = true
-  override fun getFilename() = "ide_logs"
+    override val viewModel by activityViewModels<IDELogsViewModel>()
 
-  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-    super.onViewCreated(view, savedInstanceState)
-    emptyStateViewModel.emptyMessage.value = getString(R.string.msg_emptyview_idelogs)
+    override val logLevel: Level
+        get() =  Level.DEBUG
 
-    lifecycleAwareAppender.consumer = this::appendLine
-    lifecycleAwareAppender.attachTo(viewLifecycleOwner)
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
+        super.onViewCreated(view, savedInstanceState)
+        emptyStateViewModel.setEmptyMessage(getString(R.string.msg_emptyview_idelogs))
 
-    val loggerContext = LoggerFactory.getILoggerFactory() as LoggerContext
-    val rootLogger = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME) as Logger
+        // Register with GlobalBufferAppender to receive all logs (including buffered ones)
+        GlobalBufferAppender.registerConsumer(this)
+    }
 
-    lifecycleAwareAppender.context = loggerContext
-    lifecycleAwareAppender.start()
+    override fun consume(message: String) = appendLine(message)
 
-    rootLogger.addAppender(lifecycleAwareAppender)
-  }
-
-  override fun onDestroy() {
-    super.onDestroy()
-    lifecycleAwareAppender.stop()
-
-    val logger = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME) as Logger
-    logger.detachAppender(lifecycleAwareAppender)
-  }
+    override fun onDestroyView() {
+        GlobalBufferAppender.unregisterConsumer(this)
+        super.onDestroyView()
+    }
 }

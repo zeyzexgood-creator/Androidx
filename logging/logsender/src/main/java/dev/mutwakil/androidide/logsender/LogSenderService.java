@@ -32,7 +32,6 @@ import android.os.Build.VERSION_CODES;
 import android.os.IBinder;
 import android.widget.Toast;
 import dev.mutwakil.androidide.logsender.utils.Logger;
-import dev.mutwakil.androidide.logsender.R;
 
 /**
  * A {@link Service} which runs in the background and sends logs to AndroidIDE.
@@ -41,7 +40,6 @@ import dev.mutwakil.androidide.logsender.R;
  */
 public class LogSenderService extends Service {
 
-  private final LogSender logSender = new LogSender();
   private static final int NOTIFICATION_ID = 644;
   private static final String NOTIFICATION_CHANNEL_NAME = "LogSender Service";
   private static final String NOTIFICATION_TITLE = "LogSender Service";
@@ -49,6 +47,13 @@ public class LogSenderService extends Service {
   private static final String NOTIFICATION_CHANNEL_ID = "ide.logsender.service";
   public static final String ACTION_START_SERVICE = "ide.logsender.service.start";
   public static final String ACTION_STOP_SERVICE = "ide.logsender.service.stop";
+  private final LogSender logSender = new LogSender();
+
+  @Override
+  public IBinder onBind(Intent intent) {
+    Logger.debug("Unexpected request to bind.", intent);
+    return null;
+  }
 
   @Override
   public void onCreate() {
@@ -59,14 +64,27 @@ public class LogSenderService extends Service {
   }
 
   @Override
-  public IBinder onBind(Intent intent) {
-    Logger.debug("Unexpected request to bind.", intent);
-    return null;
+  public void onDestroy() {
+    Logger.debug("[LogSenderService] [onDestroy]");
+    if (!logSender.isConnected() && !logSender.isBinding()) {
+      Logger.debug("Not bound to AndroidIDE. Ignored.");
+    } else {
+      Logger.warn("Service is being destroyed. Destroying log sender...");
+      logSender.destroy(getApplicationContext());
+    }
+
+    super.onDestroy();
   }
 
   @Override
   public int onStartCommand(Intent intent, int flags, int startId) {
     Logger.debug("onStartCommand", intent, flags, startId);
+
+    if (intent == null || intent.getAction() == null) {
+      Logger.warn("LogSenderService started with null intent: " + intent);
+      stopSelf();
+      return START_NOT_STICKY;
+    }
 
     switch (intent.getAction()) {
       case ACTION_START_SERVICE:
@@ -81,6 +99,20 @@ public class LogSenderService extends Service {
     }
 
     return START_NOT_STICKY;
+  }
+
+  @Override
+  public void onTaskRemoved(Intent rootIntent) {
+    Logger.debug("[LogSenderService] [onTaskRemoved]", rootIntent);
+
+    if (!logSender.isConnected() && !logSender.isBinding()) {
+      Logger.debug("Not bound to AndroidIDE. Ignored.");
+      return;
+    }
+
+    Logger.warn("Task removed. Destroying log sender...");
+    logSender.destroy(getApplicationContext());
+    stopSelf();
   }
 
   private void actionStartService() {
@@ -103,50 +135,6 @@ public class LogSenderService extends Service {
   private void actionStopService() {
     Logger.info("Stopping log sender service...");
     stopSelf();
-  }
-
-  @Override
-  public void onTaskRemoved(Intent rootIntent) {
-    Logger.debug("[LogSenderService] [onTaskRemoved]", rootIntent);
-
-    if (!logSender.isConnected() && !logSender.isBinding()) {
-      Logger.debug("Not bound to AndroidIDE. Ignored.");
-      return;
-    }
-
-    Logger.warn("Task removed. Destroying log sender...");
-    logSender.destroy(getApplicationContext());
-    stopSelf();
-  }
-
-  @Override
-  public void onDestroy() {
-    Logger.debug("[LogSenderService] [onDestroy]");
-    if (!logSender.isConnected() && !logSender.isBinding()) {
-      Logger.debug("Not bound to AndroidIDE. Ignored.");
-      return;
-    }
-
-    Logger.warn("Service is being destroyed. Destroying log sender...");
-    logSender.destroy(getApplicationContext());
-    super.onDestroy();
-  }
-
-  private void setupNotificationChannel() {
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-      return;
-    }
-
-    NotificationChannel channel = new NotificationChannel(
-        NOTIFICATION_CHANNEL_ID,
-        NOTIFICATION_CHANNEL_NAME,
-        NotificationManager.IMPORTANCE_LOW
-    );
-
-    NotificationManager notificationManager = getSystemService(NotificationManager.class);
-    if (notificationManager != null) {
-      notificationManager.createNotificationChannel(channel);
-    }
   }
 
   private Notification buildNotification() {
@@ -183,9 +171,25 @@ public class LogSenderService extends Service {
     // Set Exit button action
     Intent exitIntent = new Intent(this, LogSenderService.class).setAction(ACTION_STOP_SERVICE);
     builder.addAction(android.R.drawable.ic_delete,
-        res.getString(R.string.notification_action_exit),
-        PendingIntent.getService(this, 0, exitIntent, PendingIntent.FLAG_IMMUTABLE));
+            res.getString(R.string.notification_action_exit),
+            PendingIntent.getService(this, 0, exitIntent, PendingIntent.FLAG_IMMUTABLE));
 
     return builder.build();
+  }
+
+  private void setupNotificationChannel() {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+      return;
+    }
+
+    NotificationChannel channel = new NotificationChannel(
+            NOTIFICATION_CHANNEL_ID,
+            NOTIFICATION_CHANNEL_NAME,
+            NotificationManager.IMPORTANCE_LOW);
+
+    NotificationManager notificationManager = getSystemService(NotificationManager.class);
+    if (notificationManager != null) {
+      notificationManager.createNotificationChannel(channel);
+    }
   }
 }

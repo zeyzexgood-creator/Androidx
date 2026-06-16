@@ -24,6 +24,9 @@ import org.gradle.api.JavaVersion
  */
 object BuildConfig {
 
+  /** The internal name for the IDE */
+  const val internalName = "AndroidIDE-Dev"
+
   /** AndroidIDE's package name. */
   const val packageName = "dev.mutwakil.androidide"
 

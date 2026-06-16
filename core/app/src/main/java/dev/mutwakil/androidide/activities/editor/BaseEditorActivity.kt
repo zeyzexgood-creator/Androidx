@@ -90,13 +90,16 @@ import dev.mutwakil.androidide.ui.ContentTranslatingDrawerLayout
 import dev.mutwakil.androidide.ui.SwipeRevealLayout
 import dev.mutwakil.androidide.uidesigner.UIDesignerActivity
 import dev.mutwakil.androidide.utils.ActionMenuUtils.createMenu
-import dev.mutwakil.androidide.utils.ApkInstallationSessionCallback
 import dev.mutwakil.androidide.utils.DialogUtils.newMaterialDialogBuilder
 import dev.mutwakil.androidide.utils.InstallationResultHandler.onResult
 import dev.mutwakil.androidide.utils.IntentUtils
 import dev.mutwakil.androidide.utils.MemoryUsageWatcher
 import dev.mutwakil.androidide.utils.flashError
 import dev.mutwakil.androidide.utils.resolveAttr
+import dev.mutwakil.androidide.viewmodel.ApkInstallationViewModel
+import dev.mutwakil.androidide.viewmodel.AppLogsCoordinator
+import dev.mutwakil.androidide.viewmodel.AppLogsViewModel
+import dev.mutwakil.androidide.viewmodel.BottomSheetViewModel
 import dev.mutwakil.androidide.viewmodel.EditorViewModel
 import dev.mutwakil.androidide.xml.resources.ResourceTableRegistry
 import dev.mutwakil.androidide.xml.versions.ApiVersionsRegistry
@@ -135,10 +138,14 @@ abstract class BaseEditorActivity : EdgeToEdgeIDEActivity(), TabLayout.OnTabSele
    */
   protected val editorActivityScope = CoroutineScope(Dispatchers.Default)
 
-  internal var installationCallback: ApkInstallationSessionCallback? = null
 
   var uiDesignerResultLauncher: ActivityResultLauncher<Intent>? = null
   val editorViewModel by viewModels<EditorViewModel>()
+
+  val appLogsViewModel by viewModels<AppLogsViewModel>()
+  val bottomSheetViewModel by viewModels<BottomSheetViewModel>()
+  val apkInstallationViewModel by viewModels<ApkInstallationViewModel>()
+  var appLogsCoordinator: AppLogsCoordinator? = null
 
   internal var _binding: ActivityEditorBinding? = null
   val binding: ActivityEditorBinding
@@ -153,8 +160,8 @@ abstract class BaseEditorActivity : EdgeToEdgeIDEActivity(), TabLayout.OnTabSele
     override fun handleOnBackPressed() {
       if (binding.root.isDrawerOpen(GravityCompat.START)) {
         binding.root.closeDrawer(GravityCompat.START)
-      } else if (editorBottomSheet?.state != BottomSheetBehavior.STATE_COLLAPSED) {
-        editorBottomSheet?.setState(BottomSheetBehavior.STATE_COLLAPSED)
+      } else if (bottomSheetViewModel.sheetState.value.sheetState != BottomSheetBehavior.STATE_COLLAPSED) {
+        bottomSheetViewModel.setSheetState(BottomSheetBehavior.STATE_COLLAPSED)
       } else if (binding.swipeReveal.isOpen) {
         binding.swipeReveal.close()
       } else {
@@ -236,10 +243,12 @@ abstract class BaseEditorActivity : EdgeToEdgeIDEActivity(), TabLayout.OnTabSele
       ThreadUtils.getMainHandler().removeCallbacks(it)
     }
 
+    appLogsCoordinator?.also(lifecycle::removeObserver)
+    appLogsCoordinator = null
+
     optionsMenuInvalidator = null
 
-    installationCallback?.destroy()
-    installationCallback = null
+    apkInstallationViewModel.destroy(this)
 
     if (isDestroying) {
       memoryUsageWatcher.stopWatching(true)
@@ -319,6 +328,10 @@ abstract class BaseEditorActivity : EdgeToEdgeIDEActivity(), TabLayout.OnTabSele
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
+    appLogsCoordinator =
+      AppLogsCoordinator(appLogsViewModel)
+        .also(lifecycle::addObserver)
+
     this.optionsMenuInvalidator = Runnable { super.invalidateOptionsMenu() }
 
     registerLanguageServers()
@@ -336,6 +349,7 @@ abstract class BaseEditorActivity : EdgeToEdgeIDEActivity(), TabLayout.OnTabSele
     setupDrawers()
     content.tabs.addOnTabSelectedListener(this)
 
+    setupStateObservers()
     setupViews()
 
     setupContainers()
@@ -459,6 +473,8 @@ abstract class BaseEditorActivity : EdgeToEdgeIDEActivity(), TabLayout.OnTabSele
     memoryUsageWatcher.listener = memoryUsageListener
     memoryUsageWatcher.startWatching()
 
+    apkInstallationViewModel.reloadStatus(this)
+
     try {
       getFileTreeFragment()?.listProjectFiles()
     } catch (th: Throwable) {
@@ -546,7 +562,7 @@ abstract class BaseEditorActivity : EdgeToEdgeIDEActivity(), TabLayout.OnTabSele
 
   open fun hideBottomSheet() {
     if (editorBottomSheet?.state != BottomSheetBehavior.STATE_COLLAPSED) {
-      editorBottomSheet?.state = BottomSheetBehavior.STATE_COLLAPSED
+      bottomSheetViewModel.setSheetState(sheetState = BottomSheetBehavior.STATE_COLLAPSED)
     }
   }
 
@@ -655,7 +671,7 @@ abstract class BaseEditorActivity : EdgeToEdgeIDEActivity(), TabLayout.OnTabSele
     invalidateOptionsMenu()
   }
 
-  private fun setupViews() {
+  private fun setupStateObservers() {
     editorViewModel._isBuildInProgress.observe(this) { onBuildStatusChanged() }
     editorViewModel._isInitializing.observe(this) { onBuildStatusChanged() }
     editorViewModel._statusText.observe(this) { content.bottomSheet.setStatus(it.first, it.second) }
@@ -673,9 +689,6 @@ abstract class BaseEditorActivity : EdgeToEdgeIDEActivity(), TabLayout.OnTabSele
 
       invalidateOptionsMenu()
     }
-
-    setupNoEditorView()
-    setupBottomSheet()
 
     if (!app.prefManager.getBoolean(
         KEY_BOTTOM_SHEET_SHOWN
@@ -695,6 +708,11 @@ abstract class BaseEditorActivity : EdgeToEdgeIDEActivity(), TabLayout.OnTabSele
         onSwipeRevealDragProgress(progress)
       }
     }
+  }
+
+  private fun setupViews() {
+    setupNoEditorView()
+    setupBottomSheet()
   }
 
   private fun setupNoEditorView() {
@@ -803,7 +821,5 @@ abstract class BaseEditorActivity : EdgeToEdgeIDEActivity(), TabLayout.OnTabSele
     builder.create().show()
   }
 
-  open fun installationSessionCallback(): SessionCallback {
-    return ApkInstallationSessionCallback(this).also { installationCallback = it }
-  }
+
 }

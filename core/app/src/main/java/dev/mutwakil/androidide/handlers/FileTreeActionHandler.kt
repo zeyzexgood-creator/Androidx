@@ -32,7 +32,6 @@ import dev.mutwakil.androidide.events.FileContextMenuItemClickEvent
 import dev.mutwakil.androidide.events.ListProjectFilesRequestEvent
 import dev.mutwakil.androidide.fragments.sheets.OptionsListFragment
 import dev.mutwakil.androidide.models.SheetOption
-import dev.mutwakil.androidide.utils.ApkInstaller
 import dev.mutwakil.androidide.utils.InstallationResultHandler
 import dev.mutwakil.androidide.utils.flashError
 import com.unnamed.b.atv.model.TreeNode
@@ -71,11 +70,10 @@ class FileTreeActionHandler : BaseEventHandler() {
     val context = event[Context::class.java]!! as EditorHandlerActivity
     context.binding.root.closeDrawer(GravityCompat.START)
     if (event.file.name.endsWith(".apk")) {
-      ApkInstaller.installApk(
-        context,
-        InstallationResultHandler.createEditorActivitySender(context),
-        event.file,
-        context.installationSessionCallback()
+      context.apkInstallationViewModel.installApk(
+        context = context,
+        apk = event.file,
+        launchInDebugMode = false
       )
       return
     }

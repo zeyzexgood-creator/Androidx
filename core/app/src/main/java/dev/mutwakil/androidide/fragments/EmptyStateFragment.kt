@@ -1,38 +1,26 @@
-/*
- *  This file is part of AndroidIDE.
- *
- *  AndroidIDE is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  AndroidIDE is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *   along with AndroidIDE.  If not, see <https://www.gnu.org/licenses/>.
- */
-
 package dev.mutwakil.androidide.fragments
 
+import android.annotation.SuppressLint
 import android.os.Bundle
+import android.view.GestureDetector
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.viewbinding.ViewBinding
 import dev.mutwakil.androidide.databinding.FragmentEmptyStateBinding
+import dev.mutwakil.androidide.editor.ui.IDEEditor
+import dev.mutwakil.androidide.utils.viewLifecycleScope
 import dev.mutwakil.androidide.viewmodel.EmptyStateFragmentViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-/**
- * A fragment that shows a message when there is no data to show in the subclass fragment.
- *
- * @author Akash Yadav
- */
 abstract class EmptyStateFragment<T : ViewBinding> : FragmentWithBinding<T> {
-
   constructor(layout: Int, bind: (View) -> T) : super(layout, bind)
   constructor(inflate: (LayoutInflater, ViewGroup?, Boolean) -> T) : super(inflate)
 
@@ -41,41 +29,122 @@ abstract class EmptyStateFragment<T : ViewBinding> : FragmentWithBinding<T> {
 
   protected val emptyStateViewModel by viewModels<EmptyStateFragmentViewModel>()
 
-  internal var isEmpty: Boolean
-    get() = emptyStateViewModel.isEmpty.value ?: false
-    set(value) {
-      emptyStateViewModel.isEmpty.value = value
+  private var gestureDetector: GestureDetector? = null
+
+  // Cache the last known empty state to avoid returning incorrect default when detached
+  // Volatile ensures thread-safe visibility and atomicity for boolean reads/writes
+  @Volatile
+  private var cachedIsEmpty: Boolean = true
+
+  open val currentEditor: IDEEditor? get() = null
+
+  /**
+   * Called when a long press is detected on the fragment's root view.
+   * Subclasses must implement this to define the action (e.g., show a tooltip).
+   */
+  open fun onFragmentLongPressed(x: Float = -1f, y: Float = -1f) {
+    currentEditor?.let { editor ->
+      if (x >= 0 && y >= 0) {
+        editor.setSelectionFromPoint(x, y)
+      }
     }
-
-  override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-    savedInstanceState: Bundle?): View {
-
-    return FragmentEmptyStateBinding.inflate(inflater, container, false).also { emptyStateBinding ->
-      this.emptyStateBinding = emptyStateBinding
-
-      // add the main fragment view
-      emptyStateBinding.root.addView(
-        super.onCreateView(inflater, emptyStateBinding.root, savedInstanceState)
-      )
-    }.root
+    onFragmentLongPressed()
   }
 
-  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-    super.onViewCreated(view, savedInstanceState)
+  open fun onFragmentLongPressed() {
+    val currentEditor = currentEditor ?: return
+    currentEditor.selectWordOrOperatorAtCursor()
+  }
 
-    emptyStateViewModel.isEmpty.observe(viewLifecycleOwner) { isEmpty ->
-      emptyStateBinding?.apply {
-        root.displayedChild = if (isEmpty) 0 else 1
+  private val gestureListener =
+    object : GestureDetector.SimpleOnGestureListener() {
+      override fun onLongPress(e: MotionEvent) {
+        if (currentEditor?.isReadOnlyContext == true) return
+        onFragmentLongPressed(e.x, e.y)
       }
     }
 
-    emptyStateViewModel.emptyMessage.observe(viewLifecycleOwner) { message ->
-      emptyStateBinding?.emptyView?.message = message
+  internal var isEmpty: Boolean
+    get() {
+      return if (isAdded && !isDetached) {
+        // Update cache when attached and return current value
+        emptyStateViewModel.isEmpty.value.also { cachedIsEmpty = it }
+      } else {
+        // Return cached value when detached to avoid UI inconsistencies
+        cachedIsEmpty
+      }
+    }
+    set(value) {
+      // Always update cache to preserve intended state even when detached
+      cachedIsEmpty = value
+      // Update ViewModel only when attached
+      if (isAdded && !isDetached) {
+        emptyStateViewModel.setEmpty(value)
+      }
+    }
+
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?,
+  ): View =
+    FragmentEmptyStateBinding
+      .inflate(inflater, container, false)
+      .also { emptyStateBinding ->
+        this.emptyStateBinding = emptyStateBinding
+        emptyStateBinding.root.addView(
+          super.onCreateView(inflater, emptyStateBinding.root, savedInstanceState),
+        )
+      }.root
+
+  @SuppressLint("ClickableViewAccessibility")
+  override fun onViewCreated(
+    view: View,
+    savedInstanceState: Bundle?,
+  ) {
+    super.onViewCreated(view, savedInstanceState)
+
+    gestureDetector = GestureDetector(requireContext(), gestureListener)
+
+    // Set a non-consuming touch listener on the root ViewFlipper
+    emptyStateBinding?.root?.setOnTouchListener { _, event ->
+      gestureDetector?.onTouchEvent(event)
+      // Return false to allow children to handle their own touch events (e.g., scrolling)
+      false
+    }
+
+    // Sync ViewModel with cache when view is created (in case cache was updated while detached)
+    // Read cached value into local variable to ensure atomic read
+    val cachedValue = cachedIsEmpty
+    if (emptyStateViewModel.isEmpty.value != cachedValue) {
+      emptyStateViewModel.setEmpty(cachedValue)
+    }
+
+    viewLifecycleScope.launch {
+      viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+        launch {
+          emptyStateViewModel.isEmpty.collectLatest { isEmpty ->
+            withContext(Dispatchers.Main.immediate) {
+              cachedIsEmpty = isEmpty
+              emptyStateBinding?.root?.displayedChild = if (isEmpty) 0 else 1
+            }
+          }
+        }
+        launch {
+          emptyStateViewModel.emptyMessage.collect { message ->
+            withContext(Dispatchers.Main.immediate) {
+              emptyStateBinding?.emptyView?.message = message
+            }
+          }
+        }
+      }
     }
   }
 
   override fun onDestroyView() {
     this.emptyStateBinding = null
+    gestureDetector = null
     super.onDestroyView()
   }
+
 }

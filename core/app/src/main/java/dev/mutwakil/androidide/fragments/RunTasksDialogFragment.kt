@@ -48,6 +48,7 @@ import dev.mutwakil.androidide.projects.GradleProject
 import dev.mutwakil.androidide.projects.builder.BuildService
 import dev.mutwakil.androidide.resources.R
 import dev.mutwakil.androidide.tasks.executeAsync
+import dev.mutwakil.androidide.tooling.api.messages.TaskExecutionMessage
 import dev.mutwakil.androidide.tooling.api.models.GradleTask
 import dev.mutwakil.androidide.utils.SingleTextWatcher
 import dev.mutwakil.androidide.utils.doOnApplyWindowInsets
@@ -167,7 +168,8 @@ class RunTasksDialogFragment : BottomSheetDialogFragment() {
         }
 
         val toRun = viewModel.selected.toTypedArray()
-        buildService.executeTasks(*toRun)
+        val message = TaskExecutionMessage(tasks = listOf(*toRun))
+        buildService.executeTasks(message)
         dismiss()
       }
     }

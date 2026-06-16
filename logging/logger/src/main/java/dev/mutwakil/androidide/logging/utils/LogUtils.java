@@ -22,6 +22,8 @@ package dev.mutwakil.androidide.logging.utils;
  */
 public class LogUtils {
 
+  public static final String PATTERN_LAYOUT_MESSAGE_PATTERN = "%msg%n";
+
   public static boolean isJvm() {
     try {
       // If we're in a testing environment
@@ -50,5 +52,9 @@ public class LogUtils {
     }
 
     return tag;
+  }
+
+  public static String getPatternLayoutVerbosePattern(boolean omitMessage) {
+    return "%d{dd-MM HH:mm:ss.SS} %5level [%thread] %logger{0}:" + (omitMessage ? "" : " %msg") + "%n";
   }
 }

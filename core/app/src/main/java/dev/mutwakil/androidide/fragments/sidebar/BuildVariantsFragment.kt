@@ -104,6 +104,6 @@ class BuildVariantsFragment :
   }
 
   private fun checkIsEmpty() {
-    emptyStateViewModel.isEmpty.value = _binding?.variantsList?.adapter?.itemCount == 0
+    emptyStateViewModel.setEmpty(_binding?.variantsList?.adapter?.itemCount == 0)
   }
 }

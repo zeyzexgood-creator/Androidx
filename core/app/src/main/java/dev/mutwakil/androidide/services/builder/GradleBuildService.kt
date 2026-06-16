@@ -374,9 +374,8 @@ class GradleBuildService : Service(), BuildService, IToolingApiClient,
     return performBuildTasks(server!!.initialize(params))
   }
 
-  override fun executeTasks(vararg tasks: String): CompletableFuture<TaskExecutionResult> {
+  override fun executeTasks(message: TaskExecutionMessage): CompletableFuture<TaskExecutionResult> {
     checkServerStarted()
-    val message = TaskExecutionMessage(listOf(*tasks))
     return performBuildTasks(server!!.executeTasks(message))
   }
 
@@ -413,7 +412,7 @@ class GradleBuildService : Service(), BuildService, IToolingApiClient,
   }
 
   private fun ensureTmpdir() {
-    Environment.mkdirIfNotExits(Environment.TMP_DIR)
+    Environment.mkdirIfNotExists(Environment.TMP_DIR)
   }
 
   private fun logBuildInProgress() {

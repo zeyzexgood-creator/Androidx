@@ -53,6 +53,10 @@ public final class Environment {
    */
   public static File ANDROID_JAR;
 
+  private static final String ANDROID_JAR_HOME = ANDROID_HOME + "/platforms/android-36";
+
+  public static File ANDROIDIDE_GRADLE_PLUGIN_JAR;
+
   public static File TOOLING_API_JAR;
 
   public static File INIT_SCRIPT;
@@ -64,21 +68,23 @@ public final class Environment {
 
   public static void init(Context context) {
     ROOT = context.getFilesDir();
-    PREFIX = mkdirIfNotExits(new File(ROOT, "usr"));
-    HOME = mkdirIfNotExits(new File(ROOT, "home"));
-    ANDROIDIDE_HOME = mkdirIfNotExits(new File(HOME, ".androidide"));
-    TMP_DIR = mkdirIfNotExits(new File(PREFIX, "tmp"));
-    BIN_DIR = mkdirIfNotExits(new File(PREFIX, "bin"));
-    LIB_DIR = mkdirIfNotExits(new File(PREFIX, "lib"));
-    PROJECTS_DIR = mkdirIfNotExits(new File(FileUtil.getExternalStorageDir(), PROJECTS_FOLDER));
-    ANDROID_JAR = mkdirIfNotExits(new File(ANDROIDIDE_HOME, "android.jar"));
-    TOOLING_API_JAR = new File(mkdirIfNotExits(new File(ANDROIDIDE_HOME, "tooling-api")),
+    PREFIX = mkdirIfNotExists(new File(ROOT, "usr"));
+    HOME = mkdirIfNotExists(new File(ROOT, "home"));
+    ANDROIDIDE_HOME = mkdirIfNotExists(new File(HOME, ".androidide"));
+    TMP_DIR = mkdirIfNotExists(new File(PREFIX, "tmp"));
+    BIN_DIR = mkdirIfNotExists(new File(PREFIX, "bin"));
+    LIB_DIR = mkdirIfNotExists(new File(PREFIX, "lib"));
+    PROJECTS_DIR = mkdirIfNotExists(new File(FileUtil.getExternalStorageDir(), PROJECTS_FOLDER));
+    ANDROID_JAR = mkdirIfNotExists(new File(ANDROIDIDE_HOME, "android.jar"));
+    TOOLING_API_JAR = new File(mkdirIfNotExists(new File(ANDROIDIDE_HOME, "tooling-api")),
       "tooling-api-all.jar");
+    ANDROIDIDE_GRADLE_PLUGIN_JAR = new File(mkdirIfNotExists(new File(ANDROIDIDE_HOME, "plugin")),
+            "androidide-gradle-plugin.jar");
     AAPT2 = new File(ANDROIDIDE_HOME, "aapt2");
-    ANDROIDIDE_UI = mkdirIfNotExits(new File(ANDROIDIDE_HOME, "ui"));
-    REALM_DB_DIR = mkdirIfNotExits(new File(ROOT, "realm-dbs"));
+    ANDROIDIDE_UI = mkdirIfNotExists(new File(ANDROIDIDE_HOME, "ui"));
+    REALM_DB_DIR = mkdirIfNotExists(new File(ROOT, "realm-dbs"));
 
-    INIT_SCRIPT = new File(mkdirIfNotExits(new File(ANDROIDIDE_HOME, "init")), "init.gradle");
+    INIT_SCRIPT = new File(mkdirIfNotExists(new File(ANDROIDIDE_HOME, "init")), "init.gradle");
     GRADLE_USER_HOME = new File(HOME, ".gradle");
 
     ANDROID_HOME = new File(HOME, "android-sdk");
@@ -94,7 +100,7 @@ public final class Environment {
     System.setProperty("user.home", HOME.getAbsolutePath());
   }
 
-  public static File mkdirIfNotExits(File in) {
+  public static File mkdirIfNotExists(File in) {
     if (in != null && !in.exists()) {
       FileUtils.createOrExistsDir(in);
     }

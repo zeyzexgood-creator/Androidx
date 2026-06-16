@@ -26,46 +26,28 @@ import dev.mutwakil.androidide.databinding.FragmentNonEditableEditorBinding;
 import dev.mutwakil.androidide.editor.ui.IDEEditor;
 import dev.mutwakil.androidide.fragments.EmptyStateFragment;
 import dev.mutwakil.androidide.syntax.colorschemes.SchemeAndroidIDE;
+import dev.mutwakil.androidide.utils.BuildInfoUtils;
 import dev.mutwakil.androidide.utils.TypefaceUtilsKt;
 import io.github.rosemoe.sora.lang.EmptyLanguage;
 
 public abstract class NonEditableEditorFragment extends
-    EmptyStateFragment<FragmentNonEditableEditorBinding>
-    implements ShareableOutputFragment {
+        EmptyStateFragment<FragmentNonEditableEditorBinding>
+        implements ShareableOutputFragment {
 
   public NonEditableEditorFragment() {
     super(R.layout.fragment_non_editable_editor, FragmentNonEditableEditorBinding::bind);
   }
 
   @Override
-  public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-    super.onViewCreated(view, savedInstanceState);
-    getEmptyStateViewModel().getEmptyMessage().setValue(createEmptyStateMessage());
-    final var editor = getBinding().getRoot();
-    editor.setEditable(false);
-    editor.setDividerWidth(0);
-    editor.setEditorLanguage(new EmptyLanguage());
-    editor.setWordwrap(false);
-    editor.setUndoEnabled(false);
-    editor.setTypefaceLineNumber(TypefaceUtilsKt.jetbrainsMono());
-    editor.setTypefaceText(TypefaceUtilsKt.jetbrainsMono());
-    editor.setTextSize(12);
-    editor.setColorScheme(SchemeAndroidIDE.newInstance(requireContext()));
-  }
-
-  private CharSequence createEmptyStateMessage() {
-    return null;
-  }
-
-  @NonNull
-  @Override
-  public String getContent() {
+  public void clearOutput() {
     final var editor = getEditor();
     if (editor == null) {
-      return "";
+      return;
     }
 
-    return editor.getText().toString();
+    // Editing CodeEditor's content is a synchronized operation
+    editor.getText().delete(0, editor.getText().length());
+    getEmptyStateViewModel().setEmpty(true);
   }
 
   @Nullable
@@ -79,19 +61,40 @@ public abstract class NonEditableEditorFragment extends
 
   @NonNull
   @Override
-  public String getFilename() {
+  public String getShareableContent() {
+    final var editor = getEditor();
+    if (editor == null) {
+      return "";
+    }
+
+    final var editorText = editor.getText().toString();
+    return BuildInfoUtils.BASIC_INFO + System.lineSeparator() + editorText;
+  }
+
+  @NonNull
+  @Override
+  public String getShareableFilename() {
     return "build_output";
   }
 
   @Override
-  public void clearOutput() {
-    final var editor = getEditor();
-    if (editor == null) {
-      return;
-    }
+  public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+    super.onViewCreated(view, savedInstanceState);
+    getEmptyStateViewModel().setEmptyMessage(createEmptyStateMessage());
+    final var editor = getBinding().getRoot();
+    editor.setEditable(false);
+    editor.setDividerWidth(0);
+    editor.setEditorLanguage(new EmptyLanguage());
+    editor.setWordwrap(false);
+    editor.setUndoEnabled(false);
+    editor.setTypefaceLineNumber(TypefaceUtilsKt.jetbrainsMono());
+    editor.setTypefaceText(TypefaceUtilsKt.jetbrainsMono());
+    editor.setTextSize(12);
+    editor.setColorScheme(SchemeAndroidIDE.newInstance(requireContext()));
+  }
 
-    // Editing CodeEditor's content is a synchronized operation
-    editor.getText().delete(0, editor.getText().length());
-    getEmptyStateViewModel().isEmpty().setValue(true);
+  @NonNull
+  private CharSequence createEmptyStateMessage() {
+    return "";
   }
 }

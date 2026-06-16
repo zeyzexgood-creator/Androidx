@@ -180,6 +180,8 @@ dependencies {
   // So we always copy the latest JAR file to assets
   compileOnly(projects.tooling.impl)
 
+  implementation(projects.logging.logsender)
+
   testImplementation(projects.testing.unitTest)
   androidTestImplementation(projects.testing.androidTest)
 }

@@ -23,7 +23,6 @@ import ch.qos.logback.classic.spi.Configurator
 import ch.qos.logback.classic.spi.ConfiguratorRank
 import ch.qos.logback.core.spi.ContextAwareBase
 import com.google.auto.service.AutoService
-import dev.mutwakil.androidide.logging.encoder.IDELogFormatEncoder
 
 /**
  * Default IDE logging configurator.
@@ -39,11 +38,16 @@ class IDELoggingConfigurator : ContextAwareBase(), Configurator {
     addInfo("Setting up logging configuration")
 
     val appender = LogcatAppender()
-    appender.encoder = IDELogFormatEncoder()
+    appender.context = context
     appender.start()
+
+    val globalBufferAppender = GlobalBufferAppender()
+    globalBufferAppender.context = context
+    globalBufferAppender.start()
 
     val rootLogger = context.getLogger(Logger.ROOT_LOGGER_NAME)
     rootLogger.addAppender(appender)
+    rootLogger.addAppender(globalBufferAppender)
 
     return Configurator.ExecutionStatus.DO_NOT_INVOKE_NEXT_IF_ANY
   }

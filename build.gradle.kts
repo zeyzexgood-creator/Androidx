@@ -24,6 +24,7 @@ import dev.mutwakil.androidide.plugins.AndroidIDEPlugin
 import dev.mutwakil.androidide.plugins.conf.configureAndroidModule
 import dev.mutwakil.androidide.plugins.conf.configureJavaModule
 import dev.mutwakil.androidide.plugins.conf.configureMavenPublish
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -82,10 +83,7 @@ subprojects {
   }
 
   tasks.withType<KotlinCompile>().configureEach {
-    kotlinOptions {
-      jvmTarget = BuildConfig.javaVersion.toString()
-      freeCompilerArgs += "-Xstring-concat=inline"
-    }
+    compilerOptions.jvmTarget.set(JvmTarget.fromTarget(BuildConfig.javaVersion.majorVersion))
   }
 }
 

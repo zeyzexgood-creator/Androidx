@@ -61,6 +61,7 @@ public class ToolsManager {
       IJdkDistributionProvider.getInstance().loadDistributions();
 
       writeNoMediaFile();
+      extractAndroidIdeGradlePlugin();
       extractAapt2();
       extractToolingApi();
       extractAndroidJar();
@@ -77,6 +78,15 @@ public class ToolsManager {
         onFinish.run();
       }
     });
+  }
+
+  private static void extractAndroidIdeGradlePlugin() {
+    if (Environment.ANDROIDIDE_GRADLE_PLUGIN_JAR.exists()) {
+      FileUtils.delete(Environment.ANDROIDIDE_GRADLE_PLUGIN_JAR);
+    }
+
+    ResourceUtils.copyFileFromAssets(getCommonAsset("androidide-gradle-plugin.jar"),
+            Environment.ANDROIDIDE_GRADLE_PLUGIN_JAR.getAbsolutePath());
   }
 
   private static void extractColorScheme(final BaseApplication app) {
