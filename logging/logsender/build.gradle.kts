@@ -58,3 +58,13 @@ dependencies {
   testImplementation(libs.tests.robolectric)
   testImplementation(libs.tests.google.truth)
 }
+
+afterEvaluate {
+  extensions.configure<PublishingExtension>("publishing") {
+    publications.withType<MavenPublication>().configureEach {
+      pom {
+        description.set(project.description)
+      }
+    }
+  }
+}

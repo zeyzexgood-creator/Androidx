@@ -74,8 +74,8 @@ class AndroidIDEInitScriptPlugin : Plugin<Gradle> {
         }
 
         sub.afterEvaluate {
-          logger.info("Trying to apply plugin '${BuildInfo.PACKAGE_NAME}' to project '${sub.path}'")
-          sub.pluginManager.apply(BuildInfo.PACKAGE_NAME)
+          logger.info("Trying to apply plugin '${BuildInfo.MVN_GROUP_ID}' to project '${sub.path}'")
+          sub.pluginManager.apply(BuildInfo.MVN_GROUP_ID)
         }
       }
     }

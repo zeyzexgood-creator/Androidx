@@ -88,7 +88,7 @@ public final class Environment {
     GRADLE_USER_HOME = new File(HOME, ".gradle");
 
     ANDROID_HOME = new File(HOME, "android-sdk");
-    JAVA_HOME = new File(PREFIX, "lib/jvm");
+    JAVA_HOME = new File(PREFIX, "lib/jvm/java-21-openjdk");
 
     JAVA = new File(JAVA_HOME, "bin/java");
     BASH_SHELL = new File(BIN_DIR, "bash");
