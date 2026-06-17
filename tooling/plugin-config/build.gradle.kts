@@ -22,6 +22,14 @@ plugins {
   id("com.vanniktech.maven.publish.base")
 }
 
-
-
 description = "Configuration options for the Tooling API and Gradle Plugin."
+
+afterEvaluate {
+  extensions.configure<PublishingExtension>("publishing") {
+    publications.withType<MavenPublication>().configureEach {
+      pom {
+        description.set(project.description)
+      }
+    }
+  }
+}

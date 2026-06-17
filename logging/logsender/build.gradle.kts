@@ -29,7 +29,6 @@ apply {
 }
 
 
-
 description = "LogSender is used to read logs from applications built with AndroidIDE"
 
 android {

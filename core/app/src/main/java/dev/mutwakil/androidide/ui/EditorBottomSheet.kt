@@ -25,6 +25,7 @@ import android.util.AttributeSet
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.RelativeLayout
 import androidx.activity.viewModels
@@ -125,6 +126,7 @@ constructor(
   companion object {
     private val log = LoggerFactory.getLogger(EditorBottomSheet::class.java)
 
+    private const val COLLAPSE_HEADER_AT_OFFSET = 0.5f
     const val CHILD_HEADER = 0
     const val CHILD_SYMBOL_INPUT = 1
     const val CHILD_ACTION = 2
@@ -312,21 +314,7 @@ constructor(
    */
   fun setImeVisible(isVisible: Boolean) {
     isImeVisible = isVisible
-    behavior.isGestureInsetBottomIgnored = true
-    applyPeekHeight()
-  }
-
-
-  fun setSearchModeActive(isActive: Boolean) {
-    isSearchModeActive = isActive
-    if (isActive && behavior.state != BottomSheetBehavior.STATE_COLLAPSED) {
-      behavior.state = BottomSheetBehavior.STATE_COLLAPSED
-    }
-    applyPeekHeight()
-  }
-
-  private fun applyPeekHeight() {
-    behavior.peekHeight = if (isSearchModeActive) 0 else collapsedHeight.roundToInt()
+    behavior.isGestureInsetBottomIgnored = isVisible
   }
 
   fun setOffsetAnchor(view: View) {
@@ -343,7 +331,7 @@ constructor(
           binding.root.updatePadding(bottom = anchorOffset + insetBottom)
           binding.headerContainer.apply {
             updatePaddingRelative(bottom = paddingBottom + insetBottom)
-            updateLayoutParams<LayoutParams> {
+            updateLayoutParams<ViewGroup.LayoutParams> {
               height = (collapsedHeight + insetBottom).roundToInt()
             }
           }
@@ -351,6 +339,19 @@ constructor(
       }
 
     view.viewTreeObserver.addOnGlobalLayoutListener(listener)
+  }
+
+
+  fun setSearchModeActive(isActive: Boolean) {
+    isSearchModeActive = isActive
+    if (isActive && behavior.state != BottomSheetBehavior.STATE_COLLAPSED) {
+      behavior.state = BottomSheetBehavior.STATE_COLLAPSED
+    }
+    applyPeekHeight()
+  }
+
+  private fun applyPeekHeight() {
+    behavior.peekHeight = if (isSearchModeActive) 0 else collapsedHeight.roundToInt()
   }
 
   fun resetOffsetAnchor() {
@@ -367,22 +368,47 @@ constructor(
   }
 
   fun onSlide(sheetOffset: Float) {
-    val safeOffset = sheetOffset.coerceIn(0f, 1f)
+    val heightScale = if (sheetOffset >= COLLAPSE_HEADER_AT_OFFSET) {
+      ((COLLAPSE_HEADER_AT_OFFSET - sheetOffset) + COLLAPSE_HEADER_AT_OFFSET) * 2f
+    } else {
+      1f
+    }
 
-    val heightScale = 1f - safeOffset
-
-    val paddingScale = if (!isImeVisible) {
-      1f - safeOffset
-    } else 0f
+    val paddingScale = if (!isImeVisible && sheetOffset <= COLLAPSE_HEADER_AT_OFFSET) {
+      ((1f - sheetOffset) * 2f) - 1f
+    } else {
+      0f
+    }
 
     val padding = insetBottom * paddingScale
     binding.headerContainer.apply {
-      updateLayoutParams<LayoutParams> {
+      updateLayoutParams<ViewGroup.LayoutParams> {
         height = ((collapsedHeight + padding) * heightScale).roundToInt()
       }
       updatePaddingRelative(
-        bottom = padding.roundToInt(),
+        bottom = padding.roundToInt()
       )
+    }
+  }
+
+  fun onSoftInputChanged() {
+    if (context !is Activity) {
+      log.error("Bottom sheet is not attached to an activity!")
+      return
+    }
+
+    binding.symbolInput.itemAnimator?.endAnimations()
+
+    TransitionManager.beginDelayedTransition(
+      binding.root,
+      MaterialSharedAxis(MaterialSharedAxis.Y, false)
+    )
+
+    val activity = context as Activity
+    if (KeyboardUtils.isSoftInputVisible(activity)) {
+      binding.headerContainer.displayedChild = CHILD_SYMBOL_INPUT
+    } else {
+      binding.headerContainer.displayedChild = CHILD_HEADER
     }
   }
 
@@ -459,28 +485,6 @@ constructor(
   fun refreshSymbolInput(editor: CodeEditorView) {
     binding.symbolInput.refresh(editor.editor, forFile(editor.file))
   }
-
-  fun onSoftInputChanged() {
-    if (context !is Activity) {
-      log.error("Bottom sheet is not attached to an activity!")
-      return
-    }
-
-    binding.symbolInput.itemAnimator?.endAnimations()
-
-    TransitionManager.beginDelayedTransition(
-      binding.root,
-      MaterialSharedAxis(MaterialSharedAxis.Y, false),
-    )
-
-    val activity = context as Activity
-    if (KeyboardUtils.isSoftInputVisible(activity)) {
-      binding.headerContainer.displayedChild = CHILD_SYMBOL_INPUT
-    } else {
-      binding.headerContainer.displayedChild = CHILD_HEADER
-    }
-  }
-
   fun setStatus(
     text: CharSequence,
     @GravityInt gravity: Int,

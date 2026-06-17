@@ -88,7 +88,7 @@ class AndroidIDEAssetsPlugin : Plugin<Project> {
                     GenerateInitScriptTask::class.java
                 ) {
                     // mavenGroupId.set(BuildConfig.packageName)
-                    mavenGroupId.set("com.itsaky.androidide")
+                    mavenGroupId.set("io.github.wadamzmail")
                     downloadVersion.set(this@run.downloadVersion)
                 }
 

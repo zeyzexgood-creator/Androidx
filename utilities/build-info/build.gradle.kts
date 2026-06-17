@@ -59,7 +59,7 @@ tasks.create("generateBuildInfo") {
       arrayOf(
         "INTERNAL_NAME" to BuildConfig.internalName,
         "PACKAGE_NAME" to BuildConfig.packageName,
-        "MVN_GROUP_ID" to BuildConfig.packageName,
+        "MVN_GROUP_ID" to "io.github.wadamzmail",
 
         "VERSION_NAME" to rootProject.version.toString(),
         "VERSION_NAME_SIMPLE" to rootProject.simpleVersionName,
@@ -92,3 +92,13 @@ tasks.create("generateBuildInfo") {
 
 tasks.withType<JavaCompile> { dependsOn("generateBuildInfo") }
 tasks.withType<Jar> { dependsOn("generateBuildInfo") }
+
+afterEvaluate {
+  extensions.configure<PublishingExtension>("publishing") {
+    publications.withType<MavenPublication>().configureEach {
+      pom {
+        description.set(project.description)
+      }
+    }
+  }
+}

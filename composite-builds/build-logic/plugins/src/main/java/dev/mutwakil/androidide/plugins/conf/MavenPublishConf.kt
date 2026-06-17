@@ -101,7 +101,7 @@ fun Project.configureMavenPublish() {
       }
     }
 
-    coordinates("io.github.wadamzmail", project.name, project.publishingVersion)
+    coordinates(project.group.toString(), project.name, project.publishingVersion)
     publishToMavenCentral()
     signAllPublications()
 

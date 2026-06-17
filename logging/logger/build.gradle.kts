@@ -30,8 +30,6 @@ apply {
     plugin(NoDesugarPlugin::class.java)
 }
 
-
-
 description = "AndroidIDE Logging Framework"
 
 dependencies {
@@ -52,4 +50,14 @@ dependencies {
     implementation(kotlin("stdlib-jdk8"))
     implementation(libs.google.auto.service.annotations)
 
+}
+
+afterEvaluate {
+    extensions.configure<PublishingExtension>("publishing") {
+        publications.withType<MavenPublication>().configureEach {
+            pom {
+                description.set(project.description)
+            }
+        }
+    }
 }

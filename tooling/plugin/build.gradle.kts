@@ -77,7 +77,7 @@ gradlePlugin {
     }
 
     create("gradlePlugin") {
-      id = "io.github.wadamzmail.gradle"
+      id = "io.github.wadamzmail"
       implementationClass = "${BuildConfig.packageName}.gradle.AndroidIDEGradlePlugin"
       displayName = "AndroidIDE Gradle Plugin"
       description = "Gradle plugin for projects that are built with AndroidIDE"

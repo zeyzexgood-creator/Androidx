@@ -83,6 +83,10 @@ desugaring {
   }
 }
 
+configurations.configureEach {
+  exclude(group = "org.jetbrains.kotlin", module = "kotlin-android-extensions-runtime")
+}
+
 dependencies {
   debugImplementation(libs.common.leakcanary)
 
