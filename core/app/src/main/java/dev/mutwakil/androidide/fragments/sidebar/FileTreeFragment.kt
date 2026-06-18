@@ -33,8 +33,6 @@ import dev.mutwakil.androidide.adapters.viewholders.FileTreeViewHolder
 import dev.mutwakil.androidide.databinding.LayoutEditorFileTreeBinding
 import dev.mutwakil.androidide.eventbus.events.filetree.FileClickEvent
 import dev.mutwakil.androidide.eventbus.events.filetree.FileLongClickEvent
-import dev.mutwakil.androidide.events.ExpandTreeNodeRequestEvent
-import dev.mutwakil.androidide.events.ListProjectFilesRequestEvent
 import dev.mutwakil.androidide.projects.IProjectManager
 import dev.mutwakil.androidide.resources.R.drawable
 import dev.mutwakil.androidide.tasks.TaskExecutor.executeAsync
@@ -47,6 +45,8 @@ import com.unnamed.b.atv.model.TreeNode
 import com.unnamed.b.atv.model.TreeNode.TreeNodeClickListener
 import com.unnamed.b.atv.model.TreeNode.TreeNodeLongClickListener
 import com.unnamed.b.atv.view.AndroidTreeView
+import dev.mutwakil.androidide.events.ExpandTreeNodeRequestEvent
+import dev.mutwakil.androidide.events.ListProjectFilesRequestEvent
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode.MAIN

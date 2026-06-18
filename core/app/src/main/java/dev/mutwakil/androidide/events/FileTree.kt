@@ -25,4 +25,6 @@ internal data class FileContextMenuItemClickEvent(val option: SheetOption) : Eve
 
 data class ExpandTreeNodeRequestEvent(val node: TreeNode) : Event()
 
+data class CollapseTreeNodeRequestEvent(val node: TreeNode, val includeSubnodes: Boolean) : Event()
+
 class ListProjectFilesRequestEvent : Event()

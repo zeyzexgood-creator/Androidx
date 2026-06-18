@@ -27,14 +27,14 @@ import dev.mutwakil.androidide.actions.internal.DefaultActionsRegistry
 import dev.mutwakil.androidide.activities.editor.EditorHandlerActivity
 import dev.mutwakil.androidide.eventbus.events.filetree.FileClickEvent
 import dev.mutwakil.androidide.eventbus.events.filetree.FileLongClickEvent
+import dev.mutwakil.androidide.fragments.sheets.OptionsListFragment
+import dev.mutwakil.androidide.models.SheetOption
+import dev.mutwakil.androidide.utils.flashError
+import com.unnamed.b.atv.model.TreeNode
+import dev.mutwakil.androidide.events.CollapseTreeNodeRequestEvent
 import dev.mutwakil.androidide.events.ExpandTreeNodeRequestEvent
 import dev.mutwakil.androidide.events.FileContextMenuItemClickEvent
 import dev.mutwakil.androidide.events.ListProjectFilesRequestEvent
-import dev.mutwakil.androidide.fragments.sheets.OptionsListFragment
-import dev.mutwakil.androidide.models.SheetOption
-import dev.mutwakil.androidide.utils.InstallationResultHandler
-import dev.mutwakil.androidide.utils.flashError
-import com.unnamed.b.atv.model.TreeNode
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode.MAIN
@@ -158,7 +158,15 @@ class FileTreeActionHandler : BaseEventHandler() {
     requestExpandNode(lastHeld!!)
   }
 
+  private fun requestCollapseHeldNode() {
+    requestCollapseNode(lastHeld!!, true)
+  }
+
   private fun requestExpandNode(node: TreeNode) {
     EventBus.getDefault().post(ExpandTreeNodeRequestEvent(node))
+  }
+
+  private fun requestCollapseNode(node: TreeNode, includeSubnodes: Boolean) {
+    EventBus.getDefault().post(CollapseTreeNodeRequestEvent(node, includeSubnodes))
   }
 }

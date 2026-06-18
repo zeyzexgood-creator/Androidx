@@ -1,18 +1,17 @@
 package dev.mutwakil.androidide.actions.build
 
 import android.content.Context
+import androidx.activity.viewModels
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import dev.mutwakil.androidide.actions.ActionData
 import dev.mutwakil.androidide.actions.openApplicationModuleChooser
-import dev.mutwakil.androidide.activities.editor.EditorHandlerActivity
+import dev.mutwakil.androidide.projects.IProjectManager
 import dev.mutwakil.androidide.projects.android.AndroidModule
-import dev.mutwakil.androidide.projects.builder.BuildService
 import dev.mutwakil.androidide.resources.R
-import dev.mutwakil.androidide.tooling.api.messages.result.TaskExecutionResult
 import dev.mutwakil.androidide.tooling.api.models.BasicAndroidVariantMetadata
 import dev.mutwakil.androidide.utils.flashError
-import kotlinx.coroutines.Dispatchers
+import dev.mutwakil.androidide.viewmodel.BuildViewModel
 import kotlinx.coroutines.launch
 
 /**
@@ -23,16 +22,18 @@ abstract class AbstractModuleAssemblerAction(
     @StringRes private val labelRes: Int,
     @DrawableRes private val iconRes: Int,
 ) : AbstractCancellableRunAction(context, labelRes, iconRes) {
-
     override fun doExec(data: ActionData): Boolean {
+
         openApplicationModuleChooser(data) { module ->
             val activity = data.requireActivity()
 
-            val variant = module.getSelectedVariant() ?: run {
-                activity.flashError(
-                    activity.getString(R.string.err_selected_variant_not_found))
-                return@openApplicationModuleChooser
-            }
+            val variant =
+                module.getSelectedVariant() ?: run {
+                    activity.flashError(
+                        activity.getString(R.string.err_selected_variant_not_found),
+                    )
+                    return@openApplicationModuleChooser
+                }
 
             onModuleSelected(data, module, variant)
         }
@@ -42,59 +43,13 @@ abstract class AbstractModuleAssemblerAction(
     private fun onModuleSelected(
         data: ActionData,
         module: AndroidModule,
-        variant: BasicAndroidVariantMetadata
-    ) {
-        val buildService = this.buildService ?: run {
-            log.error("Cannot execute task. BuildService not found.")
-            return
-        }
-
-        if (!buildService.isToolingServerStarted()) {
-            flashError(dev.mutwakil.androidide.R.string.msg_tooling_server_unavailable)
-            return
-        }
-
-        val activity =
-            data.getActivity()
-                ?: run {
-                    log.error(
-                        "Cannot execute task. Activity instance not provided in ActionData.")
-                    return
-                }
-
-        actionScope.launch(Dispatchers.Default) {
-            activity.saveAllResult()
-
-            val result = doBuild(
-                data,
-                module,
-                variant,
-                buildService,
-                activity
-            )
-
-            log.debug("Task execution result: {}", result)
-
-            handleResult(data, result, module, variant)
-        }.invokeOnCompletion { error ->
-            if (error != null) {
-                log.error("Failed to run task", error)
-            }
-        }
-    }
-
-    protected abstract suspend fun doBuild(
-        data: ActionData,
-        module: AndroidModule,
         variant: BasicAndroidVariantMetadata,
-        buildService: BuildService,
-        activity: EditorHandlerActivity,
-    ): TaskExecutionResult?
-
-    protected abstract suspend fun handleResult(
-        data: ActionData,
-        result: TaskExecutionResult?,
-        module: AndroidModule,
-        variant: BasicAndroidVariantMetadata
-    )
+    ) {
+        val activity = data.requireActivity()
+        val buildViewModel: BuildViewModel by activity.viewModels()
+        actionScope.launch {
+            activity.saveAllResult()
+        }
+        buildViewModel.runQuickBuild(module, variant, launchInDebugMode = false)
+    }
 }

@@ -25,6 +25,9 @@ import android.widget.CheckBox
 import androidx.activity.viewModels
 import androidx.annotation.GravityInt
 import androidx.appcompat.app.AlertDialog
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.blankj.utilcode.util.SizeUtils
 import com.blankj.utilcode.util.ThreadUtils
 import dev.mutwakil.androidide.R
@@ -60,14 +63,16 @@ import dev.mutwakil.androidide.utils.DURATION_INDEFINITE
 import dev.mutwakil.androidide.utils.DialogUtils.newMaterialDialogBuilder
 import dev.mutwakil.androidide.utils.RecursiveFileSearcher
 import dev.mutwakil.androidide.utils.flashError
+import dev.mutwakil.androidide.utils.flashSuccess
 import dev.mutwakil.androidide.utils.flashbarBuilder
 import dev.mutwakil.androidide.utils.resolveAttr
 import dev.mutwakil.androidide.utils.showOnUiThread
 import dev.mutwakil.androidide.utils.withIcon
+import dev.mutwakil.androidide.viewmodel.BuildState
 import dev.mutwakil.androidide.viewmodel.BuildVariantsViewModel
+import dev.mutwakil.androidide.viewmodel.BuildViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import openjdk.tools.sjavac.BuildState
 import java.io.File
 import java.util.concurrent.CompletableFuture
 import java.util.regex.Pattern
@@ -86,6 +91,7 @@ abstract class ProjectHandlerActivity : BaseEditorActivity() {
   protected var isFromSavedInstance = false
   protected var shouldInitialize = false
 
+  private val buildViewModel by viewModels<BuildViewModel>()
   protected var initializingFuture: CompletableFuture<out InitializeResult?>? = null
 
   val findInProjectDialog: AlertDialog
@@ -146,8 +152,46 @@ abstract class ProjectHandlerActivity : BaseEditorActivity() {
 
       notifySyncNeeded()
     }
-
+    observeStates()
     startServices()
+  }
+
+  private fun observeStates() {
+    lifecycleScope.launch {
+      repeatOnLifecycle(Lifecycle.State.STARTED) {
+        launch {
+          buildViewModel.buildState.collect { onBuildStateChanged(it) }
+        }
+      }
+    }
+  }
+
+  private fun onBuildStateChanged(state: BuildState) {
+    editorViewModel.isBuildInProgress = (state is BuildState.InProgress)
+    when (state) {
+      is BuildState.Idle -> {
+        // Nothing to do, build is finished or not started.
+      }
+
+      is BuildState.InProgress -> {
+        setStatus(getString(R.string.status_building))
+      }
+
+      is BuildState.Success -> {
+        flashSuccess(state.message)
+      }
+
+      is BuildState.Error -> {
+        flashError(state.reason)
+      }
+
+      is BuildState.AwaitingInstall -> {
+        installApk(state)
+        buildViewModel.installationAttempted()
+      }
+    }
+    // Refresh the toolbar icons (e.g., the run/stop button).
+    invalidateOptionsMenu()
   }
 
   override fun onSaveInstanceState(outState: Bundle) {

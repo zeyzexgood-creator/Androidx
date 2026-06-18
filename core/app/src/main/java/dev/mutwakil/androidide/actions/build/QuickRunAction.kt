@@ -64,22 +64,4 @@ class QuickRunAction(context: Context, override val order: Int) :
         }
     }
 
-    override suspend fun doBuild(
-        data: ActionData,
-        module: AndroidModule,
-        variant: BasicAndroidVariantMetadata,
-        buildService: BuildService,
-        activity: EditorHandlerActivity
-    ): TaskExecutionResult? {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun handleResult(
-        data: ActionData,
-        result: TaskExecutionResult?,
-        module: AndroidModule,
-        variant: BasicAndroidVariantMetadata
-    ) {
-        TODO("Not yet implemented")
-    }
 }

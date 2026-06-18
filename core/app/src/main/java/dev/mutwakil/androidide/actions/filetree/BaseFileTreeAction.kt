@@ -27,9 +27,10 @@ import dev.mutwakil.androidide.actions.EditorActivityAction
 import dev.mutwakil.androidide.actions.hasRequiredData
 import dev.mutwakil.androidide.actions.markInvisible
 import dev.mutwakil.androidide.eventbus.events.Event
+import com.unnamed.b.atv.model.TreeNode
+import dev.mutwakil.androidide.events.CollapseTreeNodeRequestEvent
 import dev.mutwakil.androidide.events.ExpandTreeNodeRequestEvent
 import dev.mutwakil.androidide.events.ListProjectFilesRequestEvent
-import com.unnamed.b.atv.model.TreeNode
 import org.greenrobot.eventbus.EventBus
 import java.io.File
 
@@ -86,5 +87,9 @@ abstract class BaseFileTreeAction(
 
   protected fun requestExpandNode(node: TreeNode) {
     EventBus.getDefault().post(ExpandTreeNodeRequestEvent(node))
+  }
+
+  protected fun requestCollapseNode(node: TreeNode, includeSubnodes: Boolean) {
+    EventBus.getDefault().post(CollapseTreeNodeRequestEvent(node, includeSubnodes))
   }
 }

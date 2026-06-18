@@ -98,3 +98,4 @@ lint/outputs/
 lint/tmp/
 # lint/reports/
 /rename-package.ps1
+/androidideref3.py

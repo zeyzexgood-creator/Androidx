@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    namespace = "com.itsaky.android.library"
+    namespace = "dev.mutwakil.android.library"
     compileSdkVersion rootProject.ext.compileSdk
     buildToolsVersion rootProject.ext.buildTools
     

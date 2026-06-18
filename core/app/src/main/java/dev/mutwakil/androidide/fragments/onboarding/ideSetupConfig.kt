@@ -56,7 +56,7 @@ enum class SdkVersion(val version: String, val supportedArchs: Array<CpuArch>) {
  */
 enum class JdkVersion(val version: String) {
 
-  JDK_17("17"),
+//  JDK_17("17"),
   JDK_21("21"),
   ;
 

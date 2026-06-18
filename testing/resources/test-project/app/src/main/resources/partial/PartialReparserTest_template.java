@@ -1,4 +1,4 @@
-package com.itsaky.androidide.lsp.java.partial;
+package dev.mutwakil.androidide.lsp.java.partial;
 
 public class PartialReparserTest_template {
   public static void main(String[] args) {

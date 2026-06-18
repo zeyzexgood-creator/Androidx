@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    namespace = "com.itsaky.test.app"
+    namespace = "dev.mutwakil.test.app"
     compileSdkVersion rootProject.ext.compileSdk
     buildToolsVersion rootProject.ext.buildTools
     

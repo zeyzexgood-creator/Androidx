@@ -1,4 +1,4 @@
-package com.itsaky.test.app;
+package dev.mutwakil.test.app;
 
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;

@@ -1,9 +1,9 @@
-package com.itsaky.androidide.template.Java.kts;
+package dev.mutwakil.androidide.template.Java.kts;
 
 import android.os.Bundle;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
-import com.itsaky.androidide.template.Java.kts.databinding.ActivityMainBinding;
+import dev.mutwakil.androidide.template.Java.kts.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
 	

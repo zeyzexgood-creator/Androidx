@@ -1,4 +1,4 @@
-package com.itsaky.androidide.test;
+package dev.mutwakil.androidide.test;
 
 public class GenerateSettersAndGettersTest_template {
 
