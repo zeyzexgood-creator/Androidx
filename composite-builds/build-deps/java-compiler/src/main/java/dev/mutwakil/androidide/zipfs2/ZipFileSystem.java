@@ -1076,7 +1076,11 @@ public class ZipFileSystem extends FileSystem {
 
     @SuppressWarnings("deprecation")
     protected void finalize() throws IOException {
-        close();
+        try {
+            close();
+        } catch (IOException ignored) {
+
+        }
     }
 
     // Reads len bytes of data from the specified offset into buf.

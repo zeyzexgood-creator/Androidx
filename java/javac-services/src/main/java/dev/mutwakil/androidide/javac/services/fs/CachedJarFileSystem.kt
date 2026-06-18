@@ -21,6 +21,7 @@ import dev.mutwakil.androidide.zipfs2.ZipFileSystem
 import dev.mutwakil.androidide.zipfs2.ZipFileSystemProvider
 import jdkx.lang.model.SourceVersion
 import openjdk.tools.javac.file.RelativePath.RelativeDirectory
+import org.slf4j.LoggerFactory
 import java.io.IOException
 import java.nio.file.Path
 
@@ -30,41 +31,49 @@ import java.nio.file.Path
  * @author Akash Yadav
  */
 class CachedJarFileSystem(
-  provider: ZipFileSystemProvider?,
-  zfpath: Path?,
-  env: MutableMap<String, *>?
+    provider: ZipFileSystemProvider?,
+    zfpath: Path?,
+    env: MutableMap<String, *>?
 ) : ZipFileSystem(provider, zfpath, env) {
-  
-  internal val packages = mutableMapOf<RelativeDirectory, Path>()
 
-  override fun close() {
-    // Do nothing
-    // This is called manually by the Java LSP
-  }
-
-  @Throws(IOException::class)
-  fun doClose() {
-    super.close()
-  }
-
-  fun storeJARPackageDir(dir: Path?): Boolean {
-    if (isValid(dir?.fileName)) {
-      packages[RelativeDirectory(rootDir.relativize(dir!!).toString())] = dir
-      return true
+    companion object {
+        private val log = LoggerFactory.getLogger(CachedJarFileSystem::class.java)
     }
 
-    return false
-  }
+    internal val packages = mutableMapOf<RelativeDirectory, Path>()
 
-  private fun isValid(fileName: Path?): Boolean {
-    return if (fileName == null) {
-      true
-    } else {
-      var name = fileName.toString()
-      if (name.endsWith("/")) {
-        name = name.substring(0, name.length - 1)
-      }
-      SourceVersion.isIdentifier(name)
+    override fun close() {
+        // Do nothing
+        // This is called manually by the Java LSP
     }
-  }
+
+      @Throws(IOException::class)
+    fun doClose() {
+        try {
+            super.close()
+        } catch (e: IOException) {
+            log.warn("IOException during CachedJarFileSystem class", e)
+        }
+    }
+
+    fun storeJARPackageDir(dir: Path?): Boolean {
+        if (isValid(dir?.fileName)) {
+            packages[RelativeDirectory(rootDir.relativize(dir!!).toString())] = dir
+            return true
+        }
+
+        return false
+    }
+
+    private fun isValid(fileName: Path?): Boolean {
+        return if (fileName == null) {
+            true
+        } else {
+            var name = fileName.toString()
+            if (name.endsWith("/")) {
+                name = name.substring(0, name.length - 1)
+            }
+            SourceVersion.isIdentifier(name)
+        }
+    }
 }
